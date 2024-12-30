@@ -484,6 +484,9 @@ document.getElementById('customize').style.display = document.getElementById('cu
 
 document.getElementById('saveb').addEventListener('click', () => {
     saved = true;
+    data.platforms.forEach(platform => {
+        platform.rotation = parseInt(platform.rotation);
+    });
     window.electron.save(data);
 });
 
@@ -763,8 +766,12 @@ let val = e.target.value.toLowerCase();
 if(type == 'color') type = 'backgroundColor';
 if(type == 'width') val = addUnit(val, 'px');
 if(type == 'height') val = addUnit(val, 'px');
+if(type == 'rot') {
+    type = 'transform';
+    val = `rotate(${val}deg)`;
+}
 const savedPlatform = data.platforms.find(p => p.id === selectedPlatform.id);
-savedPlatform[type] = val;
+savedPlatform[type == 'transform' ? 'rotation' : type] = type == 'transform' ? parseInt(e.target.value) : val;
 document.getElementById(selectedPlatform.id).style[type] = val;
 console.log('Set', type, 'to', val);
 })
