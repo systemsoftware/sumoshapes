@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Honk&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <title>Sumo Shapes</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a1a2e;
+            color: white;
+        }
+
+        *{
+          outline: none;
+        }
+
+        #app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        #sidebar {
+            width: 300px;
+            background-color: #16213e;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: url('./shapes.png');
+            background-size: cover;
+        }
+
+        .logo {
+            font-family: 'Honk', cursive;
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            font-family: Poppins, sans-serif;
+            font-size: 1.2rem;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-danger {
+            background-color: #f44336;
+        }
+
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #333;
+            padding: 2rem;
+            border-radius: 10px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-family: Poppins, sans-serif;
+            margin: 0.5rem 0;
+            background-color: red;
+            font-size: large;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #players-container {
+            width: 80%;
+            max-height: 50vh;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        #ip-address {
+            font-size: 1.5rem;
+            color: #4CAF50;
+        }
+
+        #version{
+            position: fixed;
+            bottom: 1px;
+            right: 1rem;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <aside id="sidebar">
+            <h1 class="logo">SUMO SHAPES</h1>
+            <button id="start" class="btn">OPEN GAME</button>
+            <button id="stages" onclick="window.electron.findStageLocal()" class="btn">PLAY</button>
+            <button id="invite" style="display: none;" class="btn">INVITE</button>
+            <button id="settings" class="btn">SETTINGS</button>
+            <button onclick="window.electron.openStageBuilder()" class="btn">STAGE BUILDER</button>
+            <button id="quit" onclick="window.electron.quit()" class="btn">QUIT</button>
+        </aside>
+
+        <main id="main-content">
+     
+        </main>
+    </div>
+
+    <div id="ip" class="modal" style="text-align: center;">
+        <button id="close" class="btn-danger modal-close">&times;</button>
+        <h2>Invite your friends</h2>
+        <p>Have your friends join the game by entering this in their web browser:</p>
+        <p id="ip-address">1.1.1.1:1</p>
+        <button id="share" style="width: 100%;" class="btn">SHARE</button>
+    </div>
+<p onclick="document.getElementById('version').style.display='none'" id="version"></p>
+<script>
+  const { ip, port, v } = window.electron.getIP();
+  document.getElementById('ip-address').textContent = port == 80 ? ip : `${ip}:${port}`;
+  document.getElementById('version').textContent = `v${v}`;
+  
+  document.getElementById('share').addEventListener('click', () => {
+      navigator.clipboard.writeText(document.getElementById('ip-address').textContent);
+      setTimeout(() => {
+        alert('Copied to clipboard');
+      }, 150);
+  });
+
+  document.getElementById('close').addEventListener('click', () => {
+      document.getElementById('ip').style.display = 'none';
+  });
+
+  document.getElementById('invite').addEventListener('click', () => {
+      document.getElementById('ip').style.display = 'block';
+  });
+
+  document.getElementById('start').addEventListener('click', () => {
+      window.electron.openGame();
+  });
+
+  if(!window.electron.hasPlayers()){
+        document.getElementById('start').style.display = 'none';
+  }
+
+  document.getElementById('settings').addEventListener('click', () => {
+      window.electron.openSettings();
+  });
+
+
+  document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+          if(document.getElementById('ip').style.display == 'none' && document.getElementById('custom').style.display == 'none'){
+              document.getElementById('quit').click()
+          }else{
+            document.getElementById('ip').style.display = 'none';
+          document.getElementById('custom').style.display = 'none';
+          }
+      }
+  });
+  </script>
+  </body>
+  </html>

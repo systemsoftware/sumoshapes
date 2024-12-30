@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Mutators</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Honk:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            font-family: Poppins, sans-serif;
+        }
+        .select-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #4ecca3;
+            font-family: Honk, sans-serif;
+        }
+        .gamemode-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .gamemode-card {
+            background-color: #0f3460;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+        .gamemode-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        .gamemode-card h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: white;
+            font-size: 1.2rem;
+        }
+        .gamemode-card p {
+            margin-bottom: 0;
+            color: #e2e2e2;
+            font-size: 0.9rem;
+            flex-grow: 1;
+        }
+        .selected {
+            border: 2px solid #4ecca3;
+            background-color: #16456c;
+        }
+        .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .disabled-text {
+            color: #ff6b6b;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .gamemode-container {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            .gamemode-container {
+                grid-template-columns: 1fr;
+            }
+            .gamemode-card {
+                padding: 12px;
+            }
+            .gamemode-card h2 {
+                font-size: 1.1rem;
+            }
+            .gamemode-card p {
+                font-size: 0.85rem;
+            }
+        }
+
+        #gamemode-default {
+           display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="select-screen">
+        <h1>Select Mutators</h1>
+        <div id="gamemode-container" class="gamemode-container"></div>
+    </div>
+
+    <script>
+    const descriptions = {
+        default: "Knock foes off the stage and outlast everyone to claim victory.",
+        pc: "Capture control points to rack up points and dominate the match.",
+        koth: "Hold the zone to gain points and control it the longest to win.",
+        grow: "Every hit makes you grow bigger, but the larger you get, the easier you are to hit.",
+        shrink: "Taking hits shrinks you down—smaller size makes you tougher to knock off.",
+        one: "Lose a life with every hit. Run out, and you're eliminated.",
+        race: "Race to the finish line. The first one across wins the game.",
+        phase: "Players fade in and out of sight, making them harder to track down.",
+        poison: "Poison clouds randomly appear. Stay clear or lose a life!",
+        bomb: "One player is a ticking bomb. Tag someone else before time runs out!",
+        invert: "The entire game world is flipped upside down."
+    };
+
+    const mutuallyExclusive = {
+        grow: ['shrink'],
+        shrink: ['grow'],
+        race:['pc', 'koth'],
+        pc:['race'],
+        koth:['race']
+    };
+
+    const gamemodeContainer = document.getElementById('gamemode-container');
+    let selectedModes = [];
+    const modes = window.electron.getModes();
+
+    function createGamemodeCard(modeName, modeValue) {
+        const card = document.createElement('div');
+        card.className = 'gamemode-card';
+        card.id = `gamemode-${modeValue}`;
+        card.dataset.mode = modeValue;
+        card.innerHTML = `
+            <h2>${modeName}</h2>
+            <p>${descriptions[modeValue] || "No description available."}</p>
+            <p class="disabled-text"></p>
+        `;
+        card.addEventListener('click', () => toggleGamemode(card, modeValue));
+        return card;
+    }
+
+    function toggleGamemode(card, modeValue) {
+        if (card.classList.contains('disabled')) return;
+
+        if (card.classList.contains('selected')) {
+            card.classList.remove('selected');
+            selectedModes = selectedModes.filter(mode => mode !== modeValue);
+        } else {
+            card.classList.add('selected');
+            selectedModes.push(modeValue);
+        }
+
+        updateDisabledStates();
+        window.electron.setModes(selectedModes);
+    }
+
+    function updateDisabledStates() {
+        document.querySelectorAll('.gamemode-card').forEach(card => {
+            const cardMode = card.dataset.mode;
+            const conflictingMode = selectedModes.find(mode => 
+                mutuallyExclusive[mode] && mutuallyExclusive[mode].includes(cardMode)
+            );
+
+            const isDisabled = !!conflictingMode;
+
+            if (isDisabled && !card.classList.contains('selected')) {
+                card.classList.add('disabled');
+                card.querySelector('.disabled-text').textContent = `Cannot be selected with ${Object.keys(modes).find(key => modes[key] === conflictingMode)}`;
+            } else {
+                card.classList.remove('disabled');
+                card.querySelector('.disabled-text').textContent = '';
+            }
+        });
+    }
+
+    function initializeGamemodes() {
+        Object.entries(modes).forEach(([modeName, modeValue]) => {
+            const card = createGamemodeCard(modeName, modeValue);
+            gamemodeContainer.appendChild(card);
+        });
+
+        selectedModes = window.electron.getSelectedModes();
+        selectedModes.forEach(mode => {
+            const card = document.querySelector(`.gamemode-card[data-mode="${mode}"]`);
+            if (card) {
+                card.classList.add('selected');
+            }
+        });
+
+        updateDisabledStates();
+    }
+
+    initializeGamemodes();
+    </script>
+</body>
+</html>

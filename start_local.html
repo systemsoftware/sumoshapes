@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Stages</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Honk:wght@400;700&display=swap" rel="stylesheet">
+    <script src="http://localhost/qrcodejs"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        *{
+            font-family: Poppins, sans-serif;
+        }
+        .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 250px;
+    background-color: #16213e;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; 
+}
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        .menu-btn {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .menu-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .logo {
+            font-family: 'Honk', cursive;
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .main-content {
+    margin-left: 300px; /* 250px sidebar width + 50px extra space */
+    padding: 2rem;
+}
+
+        .search-bar {
+            display: flex;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 10px 0 0 10px;
+            font-size: 1rem;
+            background-color: #0f3460;
+            color: #ffffff;
+            outline: none;
+        }
+
+        .search-btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 0 10px 10px 0;
+            background-color: #007bff;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .stage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stage-card {
+            background-color: #0f3460;
+            border-radius: 10px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .stage-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stage-author {
+            font-size: 0.8rem;
+            color: #888888;
+            margin-bottom: 1rem;
+        }
+
+        .stage-btn {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+
+        .stage-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .stage-desc {
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #333;
+            padding: 2rem;
+            border-radius: 10px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-family: Poppins, sans-serif;
+            margin: 0.5rem 0;
+            background-color: red;
+            font-size: large;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        select{
+            padding: 5px;
+            border-radius: 3px;
+            border: none;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .qr-code-section {
+        margin-top: 20px;
+    }
+    #qr-code {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 150px;
+    }
+
+    .author{
+        text-align: center;
+        margin:0;
+        padding:0;
+        color: #888888;
+    }
+
+    .play{
+        background-color: #4CAF50;
+    }
+
+    .play:hover{
+        background-color: #3a883e;
+    }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">SELECT STAGE</div>
+        <button onclick="window.electron.openGame()" class="menu-btn">Play Saved Stage</button>
+        <button onclick="window.electron.playDefault()" class="menu-btn">Play Default Stage</button>
+        <button onclick="window.electron.playCustom()" class="menu-btn">Upload a Stage</button>
+        <button onclick="window.electron.openStageBuilder()" class="menu-btn">Build a Stage</button>
+        <button onclick="document.getElementById('paste').style.display = 'block'" class="menu-btn">Paste a Stage</button>
+        <button class="menu-btn" onclick="window.electron.publishStage()" style="cursor: pointer;padding-top: 1rem;text-align: center;">Publish a Stage</button>
+        <button onclick="window.electron.menu()" class="menu-btn">Return to Menu</button>
+    </nav>
+
+    <div id="mode" style="width: 30%;" class="modal">
+        <button class="modal-close" onclick="document.getElementById('mode').style.display = 'none'">X</button>
+        <h2 style="text-align: center;">Gamemodes</h2>
+        <p id="mdesc"></p>
+        <select onchange="let m = document.getElementById('modesel').value;window.electron.setMode(m);document.getElementById('mdesc').innerHTML = descriptions[m] + '!'" style="width: 100%;" id="modesel">
+            
+        </select>
+    </div>
+
+    <div id="paste" style="width: 30%;" class="modal">
+        <button class="modal-close" onclick="document.getElementById('paste').style.display = 'none'">X</button>
+        <h2 style="text-align: center;">Paste Stage</h2>
+        <p style="text-align: center;">Paste the stage code here:</p>
+        <textarea spellcheck="false" style="width: 100%; height: 200px;resize: vertical;"></textarea>
+        <button class="menu-btn" id="playpasted" style="width: 100%;">Play</button>
+    </div>
+
+    <div id="qr" style="width: 30%;display: none;" class="modal">
+        <button class="modal-close" onclick="document.getElementById('qr').style.display = 'none'">X</button>
+        <div class="qr-code-section">
+            <div id="qr-code">
+                
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search for a stage...">
+            <button id="search" class="search-btn">Search</button>
+        </div>
+
+        <div id="stage-container" class="stage-grid">
+        </div>
+    </main>
+
+    <script>
+
+const descriptions = {
+    default:"Knock your opponents off the stage and try to be the last one standing",
+    pc:"Capture the points to earn points and win the game",
+    koth:"Stay in the zone to earn points and win the game",
+    grow:"Every hit you take increases your size, the bigger you are the easier it is to get knocked off",
+    shrink:"Every hit you take decreases your size, the smaller you are the harder it is to get knocked off",
+    one:"You lose a life every time you get hit, lose all your lives and you're out",
+    race:"Race to the finish line, the first one there wins",
+    phase:"Players gradually phase in and out of visibility, making it harder to see them",
+    poison:"Random posion clouds appear on the stage, avoid them or lose a life",
+    bomb:"One player is randomly selected to be the bomb. They explode after a few seconds - unless they hit another player first",
+}
+
+        document.getElementById('search').onclick = async () => {
+            const stageContainer = document.getElementById('stage-container');
+            stageContainer.innerHTML = ''; // Clear existing stages
+            const q = document.querySelector('.search-input').value;
+            const response = await fetch(`https://api.github.com/search/repositories?q=${q}+topic:sumo-shapes-stage`);
+            const data = await response.json();
+            if(data.items.length === 0) return stageContainer.innerHTML = '<p>No stages found!</p>';
+            data.items.forEach(item => {
+                const stageCard = document.createElement('div');
+                stageCard.className = 'stage-card';
+                stageCard.innerHTML = `
+                    <div>
+                        <h3 class="stage-title">${item.name.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</h3>
+                        <p class="stage-author">by ${item.owner.login}</p>
+                         <p class="stage-desc">${item.description}</p>
+                    </div>
+                    <button class="stage-btn play" onclick="play('${item.owner.login}', '${item.name}')">Play</button>
+                    <button class="stage-btn" onclick="window.electron.openStage('${item.owner.login}','${item.name}')">View</button>
+                `;
+                stageContainer.appendChild(stageCard);
+            });
+        }
+
+        const play = (owner, name) => {
+            window.electron.playStage(owner, name);
+        }
+
+        document.onkeydown = (e) => {
+            if(document.querySelector('.search-input') === document.activeElement) return;
+            if(document.querySelector('textarea') === document.activeElement) return;
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                if(!confirm('Are you sure you want to return to the menu?')) return;
+                window.electron.menu();
+            }else if(e.key === 'Enter'){
+                e.preventDefault();
+                document.getElementById('search').click();
+            }else if(e.key == 'p'){
+                e.preventDefault();
+                document.getElementById('paste').style.display = document.getElementById('paste').style.display === 'block' ? 'none' : 'block';
+            }else if(e.key == 'm' && !e.ctrlKey && !e.metaKey){
+                e.preventDefault();
+                document.getElementById('mode').style.display = document.getElementById('mode').style.display === 'block' ? 'none' : 'block';
+            }
+        }
+
+        const qrCode = new QRCode(document.getElementById('qr-code'), {
+                text: `null`,
+                width: 150,
+                height: 150,
+                colorDark : "#ffffff",
+                colorLight : "#000000",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+        window.electron.onQRRequest((e,url) => {
+            qrCode.clear();
+            qrCode.makeCode(url);
+            document.getElementById('qr').style.display = 'block';
+        })
+
+     
+            document.getElementById('playpasted').onclick = () => {
+                try{
+                    const obj = JSON.parse(document.querySelector('textarea').value);
+                    if(typeof obj != 'object') throw 'invalid';
+                    if(!obj.platforms) throw 'invalid';
+                    window.electron.playStageObj(obj)
+                }catch{
+                    alert('Invalid stage code!')
+                }
+            }
+
+            if(!window.electron.hasSavedStage()){
+                document.querySelector('.menu-btn').style.display = 'none';
+            }
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+Reworked player images - now URLs instead of uploading images
+Added mutators: point capture, king of the hill, grow, shrink, one hit, race, phantom, poison, bomb, invert
+Reworked start game flow
+Press L to end the game and show the leaderboard
+NPCs
+Respawn locations are now random
+Redesigned end of game leaderboard and player list
+Redesigned settings menu
+Random platforms can be enabled/disabled in settings for both custom and default stages
+Remove players from a game by clicking on their name in the player list
+Invincible powerup
+Powerups now give a border to the player: green for speed, red for invincibility, blue for jump boost, and white for life regain
+Set a fallback port in case the default port is in use
+Dynamic sizing for platforms: you can now set the size of platforms the following CSS units: px, %, vw, vh, vmin, vmax, em, rem
+Custom knockback value
+Advanced developer settings
+Paste stage code directly into the app by pressing P on the Stage Select screen.
+QR code to open controller on mobile
+New view options in the Stage Finder: view a QR code, or preview the stage in the app
+Draggable playerlist and announcer
+Remember window size and position
+Customize titlebar style
+Keykinds for all Menubar actions
+Fixed volume settings
+Other small changes and bug fixes
+Lite version
+Added Platform Pallete to Stage Builder for easier platform editing

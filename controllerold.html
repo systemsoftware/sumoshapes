@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sumo Shapes Controller</title>
+  <script src="/socket.io.js"></script>
+  <script async src="/movement.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <style>
+
+    button {
+      margin: 5px;
+    }
+
+    body{
+        overflow: hidden;
+        background-color: #1a1a2e;
+        touch-action: manipulation;
+    }
+
+    *{
+        outline: none;
+        user-select: none !important;
+        color: white;
+        font-family: Poppins, sans-serif;
+    }
+
+    @media (max-width: 768px) {
+        button {
+            font-size: 0.8rem;
+        }
+        #c{
+            width: 90% !important;
+        }
+    }
+
+    .center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    z-index: 100000;
+  }
+
+
+  @media (max-width: 768px) {
+    .center {
+        width: 90%;
+    }
+  }
+
+  input, select, #startb, #remimg{
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+    margin: 10px;
+    width: 80%;
+    text-align: center;
+    background-color: #16213e;
+    box-sizing: border-box;
+  }
+
+#start{
+    display: none;
+}
+a{
+    color: #007bff;
+    text-decoration: none;
+}
+
+#startb{
+z-index: 100000;
+}
+
+
+  </style>
+</head>
+<body>
+    <div id="customize" style="width: 100%;position: fixed;z-index: 1000;background-color: #1a1a2e;height: 100%;top: 0;left: 0;text-align: center;">
+       <div class="center">
+        <h2>Choose Your Character</h2>
+        <input type="text" id="name" placeholder="Enter your name" />
+        <input type="color" id="color" value="#ffffff" />
+        <select id="shape">
+            <option value="circle">Circle</option>
+            <option value="triangle">Triangle</option>
+            <option value="square">Square</option>
+            <option value="star">Star</option>
+            <option value="hexagon">Hexagon</option>
+            <option value="octagon">Octagon</option>
+            <option value="pentagon">Pentagon</option>
+            <option value="heptagon">Heptagon</option>
+        </select>
+        <input type="url" id="file" placeholder="Image"/>
+        <button id="startb" onclick="start()" style="background-color: blue;">Join Game</button>
+          </div>
+    </div>
+    <div id="c" style="display: grid; grid-template-columns: repeat(3, 1fr); grid-gap: 10px; background:none; padding: 20px; border-radius: 10px; height: 92vh; width: 96.9%; justify-content: center; align-items: center;">
+       <div></div>
+        <button id="f" style="background-color: #16213e; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
+            <span class="material-symbols-outlined" style="transform: rotate(-90deg)">
+                arrow_forward_ios
+                </span></button></button>
+        <div></div>
+        <button id="l" style="background-color: #16213e; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;"><span class="material-symbols-outlined">
+            arrow_back_ios
+            </span></button>
+        <div></div>
+        <button id="r" style="background-color: #16213e; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
+            <span class="material-symbols-outlined">
+                arrow_forward_ios
+                </span></button>
+        <div></div>
+        <button id="b" style="background-color: #16213e; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
+            <span class="material-symbols-outlined" style="transform: rotate(90deg)">
+                arrow_forward_ios
+                </span></button>
+        <div></div>
+        <button onclick="location='/exitcontroller'" style="background-color: #16213e; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
+            Exit
+          </button>
+          <button onclick="location.reload()" style="background-color: #16213e; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
+            Reconnect
+          </button>
+          <button onclick="localStorage.clear();sessionStorage.clear();location.reload()" style="background-color: #16213e; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
+             Customize
+          </button>
+          
+          </div>
+
+   </div>
+
+   <script src="/controller.js"></script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publish a Stage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Honk&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: white;
+            background-color: #1a1a2e;
+            height: 100%;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+        header {
+            background:none;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            font-family: 'Honk', sans-serif;
+            font-size: 3em;
+            margin: 0;
+        }
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .step {
+            background-color: #16213e;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 90%;
+        }
+        .step h2 {
+            color: white;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+        }
+        .step-content {
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .step-text {
+            flex: 1;
+            min-width: 300px;
+        }
+        .step-image {
+            flex: 1;
+            margin-left: 20px;
+            min-width: 300px;
+        }
+        .step-image img {
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .important {
+            font-weight: bold;
+            color: white;
+        }
+        .icon {
+            margin-right: 10px;
+            color: white;
+            vertical-align: middle;
+        }
+        .interactive-element {
+            background-color: #1a1a2e;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .copy-button {
+            background-color: #0f3460;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: #1a1a2e;
+            padding: 5px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .progress-bar {
+            width: 90%;
+            max-width: 1000px;
+            height: 10px;
+            background-color: #16213e;
+            border-radius: 5px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .progress {
+            width: 0;
+            height: 100%;
+            background-color:white;
+            transition: width 0.5s ease-in-out;
+        }
+
+        input{
+            background-color: #0f3460;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin-left: 10px;
+            outline: none;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            background-color: #16213e;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .tab {
+            background-color: transparent;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 10px 20px;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            flex-grow: 1;
+        }
+
+        .tab:hover, .tab.active {
+            background-color: #0f3460;
+        }
+
+        .tab-content {
+            background-color: #16213e;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .step, .tabs {
+            width: 90% !important;
+            margin: auto;
+        }
+
+        main {
+            display: none;
+        }
+
+        a{
+            color: #fff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>PUBLISH A STAGE</h1>
+        </header>
+        <div class="tabs">
+            <button id="man-bttn" class="tab active">Manual Guide</button>
+            <button id="upload-bttn" class="tab">Upload Tool</button>
+        </div>
+        <main id="man">
+            <div class="step">
+                <h2><span class="material-icons icon">cloud_upload</span>Step 1: Upload to GitHub</h2>
+                <div class="step-content">
+                    <div class="step-text">
+                        <ol>
+                            <li>Create a free GitHub account at <a onclick="window.electron.openURL('https://github.com')">github.com</a> if you don't have one.</li>
+                            <li>Create a new repository on GitHub.</li>
+                            <li>Upload your stage files to the repository.</li>
+                            <li>Make sure to name the main file <span class="important">index.json</span>.</li>
+                        </ol>
+                        <div class="interactive-element">
+                            <p>Example repository structure:</p>
+                            <pre>
+my-sumo-stage/
+├── index.json
+└── README.md</pre>
+                            <button class="copy-button" onclick="copyToClipboard('my-sumo-stage/\n├── index.json\n├── assets/\n│   ├── background.png\n│   └── obstacle.png\n└── README.md')">Copy Structure</button>
+                            <button class="copy-button" onclick="copyToClipboard('index.json')">Copy Main File</button>
+                        </div>
+                    </div>
+                    <div class="step-image">
+                        <img src="./pubex1.png" alt="GitHub upload example">
+                    </div>
+                </div>
+            </div>
+<br>
+            <div class="step">
+                <h2><span class="material-icons icon">local_offer</span>Step 2: Add Topic</h2>
+                <div class="step-content">
+                    <div class="step-text">
+                        <p>Add the topic <span class="important">"sumo-shapes-stage"</span> to your repository. This identifies your repository as containing a stage for Sumo Shapes.</p>
+                        <div class="interactive-element">
+                            <p>Topic to add:</p>
+                            <input type="text" value="sumo-shapes-stage" readonly>
+                            <button class="copy-button" onclick="copyToClipboard('sumo-shapes-stage')">Copy Topic</button>
+                        </div>
+                    </div>
+                    <div class="step-image">
+                        <img src="./pubex2.png" alt="Adding topic example">
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <main id="upload">
+            <div class="step">
+                <h2><span class="material-icons icon">open_in_new</span>Step 1: Open the tool</h2>
+                <p>Click the button below to open the upload tool. If the project has been inactive for a while, it may take a few seconds to load.</p>
+                <button class="copy-button" onclick="window.electron.openURL('https://upload-stage.glitch.me/')">Open Upload Tool</button>
+            </div>
+            <br>
+            <div class="step">
+                <h2><span class="material-icons icon">login</span>Step 2: Sign in with GitHub</h2>
+                <ol>
+                <li>Create a free GitHub account at <a onclick="window.electron.openURL('https://github.com')">github.com</a> if you don't have one.</li>
+               <li> <p>Sign in with your GitHub account to access the upload tool.</p></li>
+                </ol>
+            </div>
+            <br>
+            <div class="step">
+                <h2><span class="material-icons icon">cloud_upload</span>Step 3: Upload your stage</h2>
+               <ol>
+                <li>Input your stage name into the text box.</li>
+                <li>Describe your stage in the description box.</li>
+                <li>Upload the stage files by clicking the "Choose a file" button.</li>
+                <li>Click the button to publish your stage.</li>
+               </ol>
+            </div>
+            <br>
+            <div class="step">
+                <h2><span class="material-icons icon">code</span>Optional: View the Code</h2>
+                <p>If you wish to review the source of this tool, it is open source and available on Glitch.</p>
+               <button class="copy-button" onclick="window.electron.openURL('https://glitch.com/edit/#!/upload-stage')">View on Glitch</button>
+            </main>
+            <main style="display: block;padding-top: 0px !important;">
+            <div class="step">
+                <h2><span class="material-icons icon">check_circle</span>You're Done!</h2>
+                <p>Congratulations! Your stage is now published and available for anyone to play directly from the Stage Selector.</p>
+                <div class="interactive-element">
+                    <p>Verify your stage:</p>
+                    <ol>
+                        <li>Input your username and stage name below.</li>
+                        <li>Click the "Verify" button.</li>
+                        <li>If your stage is found, you can play it in the Stage Selector!</li>
+                    </ol>
+                    <input type="text" id="u_vname" placeholder="Your username">
+                    <input type="text" id="vname" placeholder="Stage name">
+                    <button class="copy-button" onclick="completeGuide()">Verify</button>
+                </div>
+            </main>
+            </div><br>
+    <script>
+
+        const show = sessionStorage.getItem('show') || 'man'
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            });
+        }
+
+        async function completeGuide() {
+            const username = document.getElementById('u_vname').value.trim();
+            const stage = document.getElementById('vname').value.trim();
+            if (!username || !stage) {
+                alert('Please enter a username and stage name.');
+                return;
+            }
+            const req  = await fetch(`https://api.github.com/repos/${username}/${stage}/contents/index.json`);
+            if (req.status === 200) {
+                alert('Stage found! You can now play your stage in the Stage Selector.');
+            } else {
+                alert('Stage not found. Please make sure you have uploaded the stage correctly.');
+            }
+        }
+
+        // Update progress bar as user scrolls
+        window.addEventListener('scroll', () => {
+            const scrollPosition = window.scrollY;
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercentage = (scrollPosition / totalHeight) * 100;
+            document.getElementById('progress').style.width = scrollPercentage + '%';
+        });
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                if (tab.textContent === 'Manual Guide') {
+                    document.getElementById('man').style.display = 'block';
+                    document.getElementById('upload').style.display = 'none';
+                    sessionStorage.setItem('show', 'man');
+                } else {
+                    document.getElementById('man').style.display = 'none';
+                    document.getElementById('upload').style.display = 'block';
+                    sessionStorage.setItem('show', 'upload');
+                }
+            });
+        });
+
+
+        document.getElementById(`${show}-bttn`).click();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sumo Shapes</title>
+  <script src="http://localhost/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Honk&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<style>
+    canvas {
+      display: block;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    body {
+      background:'BG' !important;
+      overflow: hidden !important;
+      background-position: center !important;
+      background-size: cover !important;
+      background-repeat: no-repeat !important;
+    }
+
+    .plr {
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family:Poppins, sans-serif;
+      color: white;
+    }
+    h1{
+      color: #fff;
+      text-align: center;
+      width: 100%;
+      font-size: 35px;
+      position: fixed;
+      font-family: 'Honk', sans-serif;
+    }
+    .playerlist{
+  position: fixed;
+  top: 0;
+  left: 50%;
+  width: 100%;
+  background: none;
+  color: #fff;
+  grid-template-columns: repeat(20, 1fr);
+  text-align: center;
+  font-family: Poppins, sans-serif;
+  padding: 10px;
+  display: grid;
+  visibility: hidden;
+  background-color:BG_COLOR;
+  z-index: 10000 !important;
+  overflow-x: scroll;
+}
+
+
+    .playerlist label{
+      text-align: center;
+      margin-right: 3px;
+      margin-left: 5px;
+    }
+
+    /* disable user selection */
+    * {
+      user-select: none;
+    }
+
+    #ltop{
+      font-family: Honk, sans-serif;
+      font-size: xx-large;
+    }
+    #playAgain{
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      width: 100%;
+    }
+    
+    /* top left corner */
+    #lock {
+      position: absolute;
+      bottom: 8px;
+      z-index: 1000;
+      left: 8px;
+      font-size: 20px;
+      color: white;
+      display: none;
+    }
+
+    #alertdiv {
+      height: 90%; 
+    width:100%;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+    .playerlist {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: #333;
+      color: white;
+      padding: 5px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      z-index: 10000 !important;
+    }
+
+        
+        .player {
+            display: flex;
+            align-items: center;
+            margin: 2px 5px;
+        }
+        .player-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .player-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .player-name {
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .player-stats {
+            display: flex;
+            font-size: 0.8em;
+        }
+        .player-stats > span {
+            margin-right: 5px;
+        }
+
+        #capture-zone {
+      position: absolute;
+      background-color: rgba(128, 128, 128, 0.3); /* semi-transparent gray */
+      border: 1px solid transparent;
+    }
+
+    body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+#leaderboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            z-index: 10000 !important; 
+            transform: scale(0.9);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+
+        #leaderboard.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        #ltop {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        /* fade a text shadow in and out */
+        @keyframes glow {
+            0% {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 1);
+            }
+        }
+
+        #leaderboard-players {
+            width: 80%;
+            max-width: 800px;
+            max-height: 70vh;
+            overflow-y: auto;
+            font-family: Poppins, sans-serif;
+            padding: 1rem;
+        }
+
+        .player-item {
+            background-color: rgba(46, 46, 46, 0.59);
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            transform: translateX(-100%);
+            opacity: 0;
+            transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+        }
+
+        .player-item.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .player-rank {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-right: 1rem;
+            min-width: 3rem;
+            text-align: center;
+        }
+
+        .player-name-lb {
+            flex-grow: 1;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .player-points {
+            font-weight: bold;
+            font-size: 1.5rem;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        #playAgain {
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            font-size: 1.5rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            width: 50%;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: bounce 1s infinite alternate;
+        }
+
+        #playAgain:hover {
+            background-color: #45a049;
+            transform: scale(1.1);
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        #leaderboard-players::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #leaderboard-players::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #leaderboard-players::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+        @keyframes sway {
+            from {
+                transform: translateX(-5vw);
+            }
+            to {
+                transform: translateX(5vw);
+            }
+        }
+
+        @keyframes slideOutToTop { 
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes phase {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 'PHANTOM_OPACITY';
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.startRace {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: xx-large;
+  width: 50px;
+  height: 50px;
+  color: white;
+  display: none;
+  background-color: green;
+  border-radius: 100%;
+  border: none;
+}
+
+.timer {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  
+  width: 120px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  transition: all 0.3s ease;
+}
+
+.timer::before {
+  content: '⏱️';
+  margin-right: 8px;
+  font-size: 20px;
+}
+
+.timer:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+  transform: translateX(-50%) scale(1.05);
+}
+
+@media (max-width: 600px) {
+  .timer {
+    bottom: 10px;
+    font-size: 16px;
+    width: 100px;
+    height: 36px;
+    line-height: 36px;
+  }
+}
+  </style>
+</head>
+<body>
+  <h1 id="alert" class="draggable">PLAYERS CONNECTING...</h1>
+<div id="pl" style="resize: both;" class="playerlist draggable">
+</div>
+<button id="startRace" class="material-symbols-outlined startRace" style="color: white;">play_arrow</button>
+
+<h2 id="bombTimer" class="timer draggable">???</h2>
+
+<div id="leaderboard">
+  <div id="ltop">LEADERBOARD</div>
+  <div id="leaderboard-players"></div>
+  <button id="playAgain">Play Again</button>
+</div>
+</body>
+</html>
+<label id="lock" class="material-symbols-outlined" style="color: white;">lock</label>
+
+<audio id="bg_music" autoplay loop>
+  <source src="/bgmusic" type="audio/mpeg">
+</audio>
+<audio id="hit">
+  <source src="/hitsound" type="audio/mpeg">
+</audio>
+
+<script>
+  const lives = 'LIVES';
+  let allowFlying = 'ALLOW_FLIGHT';
+  let allowMoving = true;
+  const socket = io({
+    extraHeaders: {
+      'Access-Control-Allow-Origin': '*',
+      type: 'game'
+    }
+  });
+
+  let locked = "'LOCKED'" == 'true';
+  let explodeIn = Math.floor(Math.random() * 'EX_MAX') + 'EX_MIN';
+
+  if(locked) document.getElementById('lock').style.display = 'block';
+
+  let deathOrder = [];
+  let raceOrder = [];
+  
+  const { Engine, Render, Runner, Bodies, World, Body, Events } = Matter;
+
+
+  document.getElementById('bg_music').volume = 'BG_VOL' > 1 ? 'BG_VOL'/10 > 1 ? 1 : 'BG_VOL'/10 : 'BG_VOL';
+  document.getElementById('hit').volume = 'HIT_VOL' > 1 ? 'HIT_VOL'/10 > 1 ? 1 : 'HIT_VOL'/10 : 'HIT_VOL';
+
+  function hexToRgb(hex) {
+    // Remove the hash at the start if it's there
+    hex = hex.replace(/^#/, '');
+    
+    // Parse the r, g, b values
+    let bigint = parseInt(hex, 16);
+    let r = (bigint >> 16) & 255;
+    let g = (bigint >> 8) & 255;
+    let b = bigint & 255;
+    
+    return [r, g, b];
+}
+
+function calculateLuminance(r, g, b) {
+    // Convert the RGB values to the sRGB color space
+    r = r / 255;
+    g = g / 255;
+    b = b / 255;
+    
+    // Apply the gamma correction
+    r = (r <= 0.03928) ? r / 12.92 : Math.pow(((r + 0.055) / 1.055), 2.4);
+    g = (g <= 0.03928) ? g / 12.92 : Math.pow(((g + 0.055) / 1.055), 2.4);
+    b = (b <= 0.03928) ? b / 12.92 : Math.pow(((b + 0.055) / 1.055), 2.4);
+    
+    // Calculate the luminance
+    return (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+}
+
+function isColorLight(hex) {
+    const [r, g, b] = hexToRgb(hex);
+    const luminance = calculateLuminance(r, g, b);
+    return luminance > 0.5;
+}
+
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab' && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      const playerList = document.querySelector('.playerlist');
+      playerList.style.display = playerList.style.display === 'none' ? 'flex' : 'none';
+    }else if(e.key == 'r' && !e.ctrlKey && !e.metaKey) {
+      resetPlayerlistPositionAndSize()
+    }else if (e.key == 'l' && !e.ctrlKey && !e.metaKey) {
+      if(document.getElementById('leaderboard').classList.contains('show')) return
+      showLeaderboard()
+    }
+  });
+  
+  document.getElementById('pl').addEventListener('dblclick', function() {
+    const playerList = document.querySelector('.playerlist');
+    playerList.style.display = playerList.style.display === 'none' ? 'flex' : 'none';
+  });
+
+  const resetPlayerlistPositionAndSize = () => {
+    const playerList = document.querySelector('.playerlist');
+    playerList.style.top = '0';
+    playerList.style.left = '0';
+    playerList.style.width = '100%';
+    playerList.style.height = 'auto';
+    localStorage.removeItem('playerListPosition');
+  };
+
+  let ready = !('GAMEMODE'.includes('race'))
+
+  let raceStartPos = { x: 0, y: 0 };
+
+  document.getElementById('startRace').addEventListener('click', function() {
+   ready = true;
+   document.getElementById('startRace').style.display = 'none';
+   document.getElementById('alert').innerText = '';
+   const dummyStart = document.getElementById('start');
+   const dummyFinish = document.getElementById('finish');
+  raceStartPos = { x: dummyStart.offsetLeft + dummyStart.offsetWidth / 2, y: dummyStart.offsetTop - 100 };
+  const start = Bodies.rectangle(dummyStart.offsetLeft + dummyStart.offsetWidth / 2, dummyStart.offsetTop + dummyStart.offsetHeight / 2, dummyStart.offsetWidth, dummyStart.offsetHeight, { isStatic: true, label: 'start', render: { visible: true, fillStyle: 'green' } });
+  const finish = Bodies.rectangle(dummyFinish.offsetLeft + dummyFinish.offsetWidth / 2, dummyFinish.offsetTop + dummyFinish.offsetHeight / 2, dummyFinish.offsetWidth, dummyFinish.offsetHeight, { isStatic: true, label: 'finish', render: { visible: true, fillStyle: 'red' } });
+  dummyFinish.remove();
+  dummyStart.remove();
+  World.add(world, [start, finish]);
+  });
+  
+
+  if('GAMEMODE'.includes('race')){
+    const start = document.createElement('div');
+    start.id = 'start';
+    start.style.position = 'absolute';
+    start.style.width = '350px';
+    start.style.height = '25px';
+    start.style.backgroundColor = 'green';
+    start.style.left = '100px';
+    start.style.top = window.innerHeight - 100 + 'px';
+    start.style.cursor = 'pointer';
+    start.className = 'draggable';
+    start.style.zIndex = 1000;
+    start.innerHTML = 'START';
+    start.style.textAlign = 'center';
+    start.style.lineHeight = '25px';
+    start.style.fontFamily = 'Poppins, sans-serif';
+    start.style.color = 'white';
+    document.body.appendChild(start);
+    const finish = document.createElement('div');
+    finish.id = 'finish';
+    finish.style.position = 'absolute';
+    finish.style.width = '150px';
+    finish.style.height = '25px';
+    finish.style.zIndex = 1000;
+    finish.style.backgroundColor = 'red';
+    finish.style.left = window.innerWidth - 200 + 'px';
+    finish.style.top = `100px`;
+    finish.innerHTML = 'FINISH';
+    finish.style.textAlign = 'center';
+    finish.style.lineHeight = '25px';
+    finish.style.fontFamily = 'Poppins, sans-serif';
+    finish.style.color = 'white';
+    finish.style.cursor = 'pointer';
+    finish.className = 'draggable';
+    document.body.appendChild(finish);
+  }
+
+
+  let allSpawned = false;
+
+  socket.on('players', function(_players) {
+    if(!ready) {
+      document.getElementById('alert').innerHTML = 'DRAG THE START AND END POINTS TO MOVE THEM, THEN PRESS <label class="material-symbols-outlined">play_arrow</label> TO START THE RACE';
+      document.getElementById('startRace').style.display = 'block';
+    }
+    const waitInt = setInterval(() => {
+      if(ready) {
+    clearInterval(waitInt);
+    if(locked) return
+    if(document.getElementById('leaderboard').classList.contains('show')) return
+    console.log('FROM SERVER - Players:', _players);
+    if('GAMEMODE'.includes('pc') || 'GAMEMODE'.includes('koth')) {
+      document.getElementById('alert').innerText = `FIRST TO 'FIRST_TO' POINTS WINS!`;
+      setTimeout(() => {
+        document.getElementById('alert').innerText = ''
+      }, 4000);
+    }
+    else if(_players.length) document.getElementById('alert').innerText = ''
+    _players.forEach((player, i) => {
+      setTimeout(() => {
+        newPlayer(player);
+      }, i * 100);
+    });
+    const w_in = setInterval(() => {
+      let plen = Object.keys(players).length;
+      if('GAMEMODE' != 'race') plen -= 'NPCS';
+      if(plen != _players.length) return console.log('Not all players have spawned', Object.keys(players).length, _players.length);
+      allSpawned = true;
+      clearInterval(w_in);
+        if('GAMEMODE'.includes('bomb')) {
+     const bomb = _players[Math.floor(Math.random() * _players.length)];
+      console.log('Bomb:', bomb);
+      document.getElementById('alert').innerText = `${bomb.name} is the bomb!`.toUpperCase();
+      if(players[bomb.id]){
+        players[bomb.id].bomb = true;
+      document.getElementById(bomb.id).style.border = `3px solid ${isColorLight(bomb.color) ? '#000' : '#fff'}`;
+      }
+      setTimeout(() => {
+        document.getElementById('alert').innerText = '';
+      }, 2000);
+  }
+}, 300);
+    }
+  }, 300);
+  })
+
+  const engine = Engine.create();
+  const world = engine.world;
+
+  const render = Render.create({
+    element: document.body,
+    engine: engine,
+    options: {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      background: 'transparent',
+      wireframes: false
+    }
+  });
+
+  Render.run(render);
+  Runner.run(Runner.create(), engine);
+
+  let players = {};
+  const playerSize = 'PLAYER_SIZE'
+
+  const playerListHeight = document.getElementById('pl').offsetHeight;
+
+const boundaries = []
+const canvas = document.querySelector('canvas');
+if('GAMEMODE'.includes('invert')) boundaries.push(Bodies.rectangle(canvas.width / 2, playerListHeight, 'PLATFORM_WIDTH', playerListHeight+50, { isStatic: true }) )
+else boundaries.push(Bodies.rectangle(window.innerWidth / 2, window.innerHeight - playerListHeight, 'PLATFORM_WIDTH', 50, { isStatic: true, label:"floor", render: { visible: true } }))
+
+
+if('GAMEMODE'.includes('invert')) {
+  document.getElementById('pl').style.bottom = '0';
+  document.getElementById('pl').style.top = 'auto';
+}
+
+
+
+boundaries[0].render.fillStyle = "'PLATFORM_BG'";
+
+socket.on('lock', d => {
+  console.log('Locking game');
+  document.getElementById('lock').style.display = d == true ? 'block' : 'none';
+  locked = d
+})
+
+  World.add(world, boundaries);
+
+
+
+  const newPlayer = (player) => {
+    if(document.getElementById(player.id)) return console.log('Player already exists');
+    let posX;
+    let posY;
+    if('GAMEMODE'.includes('race')) {
+      posX = raceStartPos.x;
+      posY = raceStartPos.y;
+    }else {
+      posX = Math.random() * window.innerWidth;
+      posY = Math.random() * window.innerHeight;
+    }
+    const body = Bodies.circle(posX, posY, playerSize / 2, {
+      label: player.id,
+      restitution:'RESTITUTION',
+      friction: 'FRICTION',
+      isStatic: false,
+      frictionAir: 'FRICTION_AIR',
+      render: {
+        visible: false
+      },
+    });
+
+    if(player.ability == 'jump'){
+      body.frictionAir = 0.1;
+    }
+
+    if(player.ability == 'speed'){
+      body.frictionAir = 0.01;
+    }
+
+    if(document.getElementById(`pl-${player.id}`)){
+        document.getElementById(`pl-${player.id}`).remove();
+      }
+
+    World.add(world, body);
+    players[player.id] = { ...player, body, lives, jumpCount: 0, isJumping: false, knockback: 1, isGrounded: false, points:0};
+    if('GAMEMODE'.includes('bomb')) players[player.id].bomb = false;
+    document.getElementById('pl').innerHTML += ` <div onclick="remove('${player.id}')" class="player" id="pl-${player.id}">
+            <div class="player-icon" style="background: ${player.photo ? `url(${player.photo})` : player.color}"></div>
+            <div class="player-info">
+                <span class="player-name">${player.name}</span>
+                <div class="player-stats">
+                    <span id="pl-${player.id}-l"> ❤️ ${lives}</span>
+                    <span id="pl-${player.id}-kb">💥 1.00</span>
+                    ${ 'GAMEMODE'.includes('pc') || 'GAMEMODE'.includes('koth') ? `<span id="pl-${player.id}-pts">0P</span>` : '' }
+                </div>
+            </div>
+        </div>`;
+    document.getElementById('pl').style.visibility = 'visible';
+
+    const el = document.createElement('div');
+    el.id = player.id;
+    el.innerHTML = player.name;
+    el.className = 'plr';
+    el.style.borderRadius = '0%';
+    el.style.width = `${playerSize}px`;
+    el.style.height = `${playerSize}px`;
+    if('GAMEMODE'.includes('phase')) {
+    let randomOffset = Math.random() * 10;
+    el.style.animation = `phase 'PHANTOM_DUR's infinite`;
+    el.style.animationDelay = `${randomOffset}s`;
+}
+    if(player.shape == 'triangle') {
+      el.style.clipPath = 'polygon(50% 0%, 0% 100%, 100% 100%)';
+    }else if(player.shape == 'circle') {
+      el.style.borderRadius = '50%';
+    }else if(player.shape == 'square') {
+      el.style.borderRadius = '0';
+    }else if (player.shape == 'star') {
+      el.style.borderRadius = '0';
+      el.style.clipPath = 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
+    }else if(player.shape == 'hexagon') {
+      el.style.borderRadius = '0';
+      el.style.clipPath = 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)';
+    }else if(player.shape == 'octagon') {
+      el.style.borderRadius = '0';
+      el.style.clipPath = 'polygon(50% 0%, 85% 15%, 100% 50%, 85% 85%, 50% 100%, 15% 85%, 0% 50%, 15% 15%)';
+    }else if (player.shape == 'pentagon') {
+      el.style.borderRadius = '0';
+      el.style.clipPath = 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)';
+    }else if (player.shape == 'heptagon') {
+      el.style.borderRadius = '0';
+      el.style.clipPath = 'polygon(50% 0%, 85% 15%, 100% 50%, 85% 85%, 50% 100%, 15% 85%, 0% 50%, 15% 15%)';
+    }
+    el.style.backgroundColor = player.color
+
+    if (isColorLight(player.color)) {
+      el.style.color = '#000000';
+    }
+
+    if(player.photo) {
+      el.style.backgroundImage = `url(${player.photo})`;
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = 'center';
+    }
+
+    document.body.appendChild(el);
+
+    return {
+      body,
+      element: el
+    }
+  };
+
+  const remove = (id) => {
+    if(!confirm('Are you sure you want to remove this player?')) return;
+    const player = players[id];
+    if (player) {
+      World.remove(world, player.body);
+    delete players[id];
+    }
+    if(document.getElementById(id)) document.getElementById(id).remove();
+    if(document.getElementById(`pl-${id}`)) document.getElementById(`pl-${id}`).remove();
+  }
+
+  let cdown = explodeIn;
+  console.log('Explode in:', explodeIn);
+
+  const updatePlayers = () => {
+    Object.values(players).forEach(player => {
+      const { body, id } = player;
+      const el = document.getElementById(id);
+      el.style.left = `${body.position.x - playerSize / 2}px`;
+      el.style.top = `${body.position.y - playerSize / 2}px`;
+    });
+  };
+
+  if('GAMEMODE'.includes('bomb')) {
+  setInterval(() => {
+    if(Object.keys(players).length <= 0) return document.getElementById('bombTimer').innerHTML = '';
+    document.getElementById('bombTimer').style.display = 'flex';
+    document.getElementById('bombTimer').innerHTML = cdown;
+    if(cdown == 5) {
+      document.getElementById('alert').innerText = '5 SECONDS UNTIL EXPLOSION!';
+    }
+    if(cdown <= 0){
+      cdown = explodeIn;
+    }
+    cdown--;
+  }, 1000);
+}
+
+  Events.on(engine, 'afterUpdate', updatePlayers);
+
+  socket.on('disconnect', function() {
+    console.log('Disconnected from server');
+    alert('You have been disconnected from the server');
+  });
+
+  socket.on('playerConnected', function(data) {
+    if(!allowMoving) return;
+    console.log('Player connected:', data);
+    document.getElementById('pl').style.visibility = 'visible';
+    document.getElementById('alert').innerText = `${data.name} has joined the game!`.toUpperCase();
+   setTimeout(() => {
+     document.getElementById('alert').innerText = '';
+   }, 1500);
+    newPlayer(data);
+  });
+
+  socket.on('playerDisconnected', function(data) {
+    const player = players[data];
+    if (player) {
+      World.remove(world, player.body);
+    }
+    if(players[data]) delete players[data];
+      if(document.getElementById(data)) document.getElementById(data).remove();
+      if(Object.keys(players).length === 0) {
+        document.getElementById('pl').style.visibility = 'hidden';
+      }
+
+      if(deathOrder.find(p => p.id === data)) {
+        deathOrder = deathOrder.filter(p => p.id !== data);
+      }
+
+      if(document.getElementById(`pl-${data}`)){
+        document.getElementById(`pl-${data}`).remove();
+      }
+  });
+
+  Events.on(engine, 'beforeUpdate', function(event) {
+  Object.values(players).forEach(player => {
+    const { body, id } = player;
+
+    if (body.position.x < 0 || body.position.x > window.innerWidth || body.position.y < 0 || body.position.y > (window.innerHeight + 100)) {
+      Body.setVelocity(body, { x: 0, y: 0 });
+      player.lives -= 1;
+      player.jumpCount = 0;
+      player.isJumping = false;
+      player.knockback = 1;
+      document.getElementById(`pl-${id}-l`).innerText = `❤️ ${player.lives}`;
+      document.getElementById(`pl-${id}-kb`).innerText = `💥 ${player.knockback.toFixed(2)}`
+      document.getElementById('alert').innerText = `${player.name} has lost a life!`.toUpperCase();
+     if('GAMEMODE'.includes('grow') || 'GAMEMODE'.includes('shrink'))  Body.scale(body, 'PLAYER_SIZE' / body.circleRadius, 'PLAYER_SIZE' / body.circleRadius);
+      document.getElementById(id).style.width = `'PLAYER_SIZE'px`;
+      document.getElementById(id).style.height = `'PLAYER_SIZE'px`;
+      setTimeout(() => {
+        document.getElementById('alert').innerText = '';
+      }, 2000);
+      if (player.lives <= 0) {
+        isDead(player);
+      } else {
+        Body.setPosition(body, { x: window.innerWidth * Math.random(), y: window.innerHeight * Math.random() });
+      }
+    }
+  });
+});
+
+
+socket.on('move', function(data) {
+  if (!allowMoving) return;
+  const player = players[data.id];
+  if (player) {
+    const { body } = player;
+
+    let velocityX = 0;
+    let velocityY = 0;
+
+    if (data.direction === 'forward') {
+      if (allowFlying === false) {
+        if (player.jumpCount < 2 && !player.isJumping) {
+          const jumpForce = -'JUMP_FORCE'; 
+          const gravity = 0.98; 
+
+          player.jumpCount++;
+          player.isJumping = true;
+          velocityY = jumpForce * (player.jumpBoost ? parseInt('JUMP_BOOST') : 1)
+
+          Body.setVelocity(body, { x: velocityX, y: velocityY });
+
+          Body.applyForce(body, body.position, { x: velocityX * 0.001, y: velocityY * 0.001 });
+
+          player.jumpInterval = setInterval(() => {
+            // Increase the downward velocity to simulate gravity
+            velocityY += gravity;
+
+            // Apply the updated velocity
+            Body.setVelocity(body, { x: velocityX, y: velocityY });
+          }, 100); 
+
+          setTimeout(() => {
+            clearInterval(player.jumpInterval);
+            player.isJumping = false;
+          }, 500);
+
+        }
+      } else {
+        velocityY = -data.speed;
+      }
+    } else if (data.direction === 'backward') {
+      velocityY = data.speed;
+    } else if (data.direction === 'left') {
+      velocityX = -data.speed * (player.speedBoost ? parseInt('SPEED_BOOST') : 1);
+    } else if (data.direction === 'right') {
+      velocityX = data.speed * (player.speedBoost ? parseInt('SPEED_BOOST') : 1);
+    }
+
+    Body.setVelocity(body, { x: velocityX, y: velocityY });
+    Body.applyForce(body, body.position, { x: velocityX * 0.001, y: velocityY * 0.001 });
+  }
+});
+
+if('RANDOM_PLATFORMS'){
+  setInterval(() => {
+    if(!ready) return;
+    if (!allowMoving) return;
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * window.innerHeight;
+    const width = Math.random() * 200 + 100;
+    const height = 10;
+
+    const platformColor = "'PLATFORM_BG'"
+
+const platform = Bodies.rectangle(x, y, width, height, {
+  isStatic: true,
+  label: 'platform',
+  render: {
+    fillStyle: platformColor,
+    strokeStyle: 'transparent'
+  }
+});
+
+
+    World.add(world, platform);
+
+    if (world.bodies.length > 10) {
+      const platform = world.bodies.find(body => body.label === 'platform');
+      World.remove(world, platform);
+    }
+  }, parseInt('PLATFORM_FREQ') * 1000);
+}
+
+function toPX(value, dimension) {
+  if (typeof value === 'number') {
+    return value; 
+  }
+
+  const cssValue = value.toString().trim();
+  const numValue = parseFloat(cssValue);
+
+  if (isNaN(numValue)) {
+    console.error('Invalid CSS value:', value);
+    return 0;
+  }
+
+  const unit = cssValue.slice(numValue.toString().length).toLowerCase();
+
+  switch (unit) {
+    case '%':
+      return (dimension === 'width' ? window.innerWidth : window.innerHeight) * (numValue / 100);
+    case 'vh':
+      return window.innerHeight * (numValue / 100);
+    case 'vw':
+      return window.innerWidth * (numValue / 100);
+    case 'vmin':
+      return Math.min(window.innerWidth, window.innerHeight) * (numValue / 100);
+    case 'vmax':
+      return Math.max(window.innerWidth, window.innerHeight) * (numValue / 100);
+    case 'px':
+    case '':
+      return numValue;
+      case 'rem':
+      return numValue * parseFloat(getComputedStyle(document.documentElement).fontSize);
+      break
+      case 'em':
+      return numValue * parseFloat(getComputedStyle(document.body).fontSize);
+      break
+    default:
+      console.warn('Unsupported unit:', unit, 'Assuming pixels.');
+      return numValue;
+  }
+}
+
+function createFlexibleBody(x, y, width, height, options = {}) {
+  const pixelWidth = toPX(width, 'width');
+  const pixelHeight = toPX(height, 'height');
+  
+  // Convert x and y to pixels, but keep them centered
+  const pixelX = toPX(x, 'width') + pixelWidth / 2;
+  const pixelY = toPX(y, 'height') + pixelHeight / 2;
+
+  return Bodies.rectangle(pixelX, pixelY, pixelWidth, pixelHeight, options);
+}
+
+'PLATFORMS'.forEach(platform => {
+  const { x, y, width, height, color, rotation } = platform;
+  const _platform = createFlexibleBody(x, y, width, height, {
+    isStatic: true,
+    label: 'platform_custom',
+    render: {
+      fillStyle: color,
+      strokeStyle: 'transparent'
+    }
+  });
+  Body.rotate(_platform, rotation * (Math.PI / 180));
+  World.add(world, _platform);
+});
+
+function increment(id, points) {
+  if(!players[id]) return console.log('Player not found');
+  players[id].points += points;
+document.getElementById(`pl-${id}-pts`).innerText = `${players[id].points}P`;
+if(players[id].points >= 'FIRST_TO') {
+  document.getElementById('alert').innerText = `${players[id].name} has won the game!`.toUpperCase();
+  setTimeout(() => {
+    document.getElementById('alert').innerText = '';
+  }, 2000);
+  showLeaderboard();
+}
+}
+
+if('GAMEMODE' != 'bomb') document.getElementById('bombTimer').style.display = 'none';
+
+
+function showLeaderboard() {
+  if(!ready || !allSpawned) return console.log('Game not ready')
+            allowMoving = false;
+            let leaderboard;
+document.getElementById('leaderboard').style.display = 'flex';
+
+document.getElementById('bombTimer').style.display = 'none';
+
+document.getElementById('pl').style.animation = 'slideOutToTop 1s forwards';
+
+document.body.style.backdropFilter = "blur('BLUR_PX'px)";
+
+
+Render.stop(render);
+
+document.getElementById('alert').innerText = '';
+
+            if('GAMEMODE'.includes('race')) leaderboard = raceOrder
+  else if('GAMEMODE'.includes('pc') || 'GAMEMODE'.includes('koth')) leaderboard = Object.values(players).sort((a, b) => b.points - a.points);
+  else {
+    if(Object.keys(players).length != deathOrder.length) Object.values(players).sort((a, b) => b.lives - a.lives).sort((a, b) => b.knockback - a.knockback).forEach(player => {
+      if(!deathOrder.find(p => p.id === player.id)) deathOrder.push({ id: player.id, name: player.name, points: player.points });
+    });
+    leaderboard = deathOrder.reverse();
+  }
+
+            World.clear(world, false);
+            players = {};
+           if(document.getElementById('capture-zone')) document.getElementById('capture-zone').remove();
+            document.querySelectorAll('.plr').forEach(el => el.remove());
+
+            world.bodies.forEach(body => {
+                if (body.label === 'platform' || body.label === 'platform_custom') {
+                    World.remove(world, body);
+                }
+            });
+            
+            const leaderboardPlayers = document.getElementById('leaderboard-players');
+            leaderboardPlayers.innerHTML = '';
+
+            leaderboard.forEach((player, i) => {
+                const el = document.createElement('div');
+                el.className = 'player-item';
+                el.innerHTML = `
+                    <span class="player-rank">${i + 1}</span>
+                    <span class="player-name-lb">${player.name}</span>
+                    ${ 'GAMEMODE'.includes('pc') || 'GAMEMODE'.includes('koth') ? `<span class="player-points">${player.points} pts</span>` : ""}
+                `;
+                el.style.color = i === 0 ? '#FFD700' : i === 1 ? '#C0C0C0' : i === 2 ? '#CD7F32' : 'white';
+                leaderboardPlayers.appendChild(el);
+
+                setTimeout(() => {
+                    el.classList.add('show');
+                }, i * 100);
+            });
+
+            const leaderboard_el = document.getElementById('leaderboard');
+            leaderboard_el.classList.add('show');
+
+        }
+
+     
+
+        document.getElementById('playAgain').addEventListener('click', () => {
+            window.electron ? window.electron.playAgain() : location.reload();
+            allowMoving = true;
+            document.getElementById('leaderboard').classList.remove('show');
+        });
+
+        const isDead = (player) => {
+          if (player.lives <= 0) {
+        World.remove(world, player.body);
+        document.getElementById('alert').innerText = `${player.name} has lost all lives!`.toUpperCase();
+        setTimeout(() => {
+          document.getElementById('alert').innerText = '';
+        }, 2000);
+        document.getElementById(player.id).remove();
+        delete players[player.id];
+        
+        // Add player to death order
+        deathOrder.push({ id: player.id, name: player.name, points: player.points });
+
+        // Check if all players have died
+        if (Object.keys(players).length <= 1) {
+          const lastPlayer = Object.values(players)[0];
+          if(!lastPlayer) return showLeaderboard();
+          deathOrder.push({ id: lastPlayer.id, name: lastPlayer.name });
+          showLeaderboard();
+        }
+        }
+        }
+
+        Events.on(engine, 'collisionStart', function(event) {
+          console.log(allSpawned)
+          if(!allSpawned) return;
+  console.log('Collision detected');
+  const pairs = event.pairs;
+
+  pairs.forEach(pair => {
+    const { bodyA, bodyB } = pair;
+
+    if (!bodyA || !bodyB) {
+      console.warn('One of the collision bodies is undefined:', pair);
+      return;
+    }
+
+    const playerA = bodyA.label === 'npc' ? true : players[bodyA.label];
+    const playerB = bodyB.label === 'npc' ? true : players[bodyB.label];
+
+    if (players[bodyA.label]) players[bodyA.label].jumpCount = 0;
+    if (players[bodyB.label]) players[bodyB.label].jumpCount = 0;
+
+    if ((playerA && bodyB.label.includes('powerup')) || (playerB && bodyA.label.includes('powerup'))) {
+      const player = players[playerA ? bodyA.label : bodyB.label];
+      const powerup = bodyA.label.includes('powerup') ? bodyA.label.split('-')[1] : bodyB.label.split('-')[1];
+      const powerup_id = bodyA.label.includes('powerup') ? bodyA.label.split('-')[2] : bodyB.label.split('-')[2];
+
+      if (powerup === 'speed') players[player.body.label].speedBoost = true;
+      if (powerup === 'jump') players[player.body.label].jumpBoost = true;
+      if(powerup === 'invincible') players[player.body.label].invincible = true;
+      if (powerup === 'lives') {
+        players[player.body.label].lives += 1;
+        document.getElementById(`pl-${player.body.label}-l`).innerText = `${players[player.body.label].lives}L`;
+      }
+
+      document.getElementById(player.body.label).style.border = `2px solid ${powerup === 'speed' ? 'blue' : powerup === 'jump' ? 'green' : powerup === 'invincible' ? 'red' : 'white'}`;
+
+      setTimeout(() => {
+        if (powerup === 'speed') players[player.body.label].speedBoost = false;
+        if (powerup === 'jump') players[player.body.label].jumpBoost = false;
+        if(powerup === 'invincible') players[player.body.label].invincible = false;
+        if(players[player.body.label].bomb){
+          document.getElementById(player.body.label).style.border = `3px solid ${isColorLight(bomb.color) ? '#000' : '#fff'}`
+        }else{
+          document.getElementById(player.body.label).style.border = 'none';
+        }
+      }, 'POWERUP_DURATION' * 1000);
+
+      if (document.getElementById(powerup_id)) document.getElementById(powerup_id).remove();
+      World.remove(world, bodyB);
+      return;
+    } else if ((playerA && bodyB.label.includes('point')) || (playerB && bodyA.label.includes('point'))) {
+      const player = players[playerA ? bodyA.label : bodyB.label];
+      const point = bodyA.label.includes('point') ? bodyA.label.split('-')[1] : bodyB.label.split('-')[1];
+
+      increment(player.id, 1);
+
+      if (document.getElementById(point)) document.getElementById(point).remove();
+      World.remove(world, bodyB);
+      return;
+    }
+
+
+
+    if (playerA && bodyB.label === 'poison-zone' || playerB && bodyA.label === 'poison-zone') {
+      console.log('Player entered poison zone');
+       (playerA ?? playerB).posionStart = Date.now();
+    }
+
+    if (bodyA?.label === 'finish' || bodyB?.label === 'finish') {
+      console.log('Finish line collision detected');
+      const player = bodyA.label === 'finish' ? playerB : playerA;
+      if (player) {
+        console.log('Player has crossed the finish line:', player);
+        document.getElementById('alert').innerText = `${player.name} HAS CROSS THE FINISH LINE!`.toUpperCase();
+        setTimeout(() => {
+          document.getElementById('alert').innerText = '';
+        }, 2000);
+        raceOrder.push({ id: player.id, name: player.name });
+
+        if (Object.keys(players).length === raceOrder.length) {
+          console.log('All players have crossed the finish line');
+          showLeaderboard();
+        }
+      }
+    }
+
+
+    if (playerA && playerB && playerA.id !== playerB.id) {
+      document.getElementById('hit').play();
+
+      console.log('Player collision', playerA, playerB);
+
+      // Determine which player is hitting the other based on velocity
+      const velocityA = playerA.body.velocity;
+      const velocityB = playerB.body.velocity;
+      const speedA = Math.sqrt(velocityA.x * velocityA.x + velocityA.y * velocityA.y);
+      const speedB = Math.sqrt(velocityB.x * velocityB.x + velocityB.y * velocityB.y);
+
+      clearInterval(playerA.jumpInterval);
+      playerA.isJumping = false;  // Reset jumping state after jump sequence
+      if (playerA.jumpCount >= 2) {
+        playerA.jumpCount = 0;  // Reset jump count if limit is reached
+      }
+      clearInterval(playerB.jumpInterval);
+      playerB.isJumping = false;  // Reset jumping state after jump sequence
+      if (playerB.jumpCount >= 2) {
+        playerB.jumpCount = 0;  // Reset jump count if limit is reached
+      }
+
+      let hitter, hit;
+      if (speedA > speedB) {
+        hitter = playerA;
+        hit = playerB;
+      } else {
+        hitter = playerB;
+        hit = playerA;
+      }
+
+      
+      if(players[hit.id].invincible) return;
+
+      if ('GAMEMODE'.includes('one')) {
+        players[hit.id].lives--;
+        document.getElementById(`pl-${hit.id}-l`).innerText = `${players[hit.id].lives}L`;
+        document.getElementById('alert').innerText = `${players[hit.id].name} has lost a life!`.toUpperCase();
+        setTimeout(() => {
+          document.getElementById('alert').innerText = '';
+        }, 2000);
+        isDead(hit);
+      }
+
+      if('GAMEMODE'.includes('bomb')) {
+       if(hitter.bomb) {
+        console.log(hitter.name, 'has bombed', hit.name);
+        players[hit.id].bomb = true;
+        document.getElementById('alert').innerText = `${hit.name} WAS BOMBED!`.toUpperCase();
+        setTimeout(() => {
+          document.getElementById('alert').innerText = '';
+        }, 2000);
+        document.getElementById(hit.id).style.border = `3px solid ${isColorLight(bomb.color) ? '#000' : '#fff'}`
+        hitter.bomb = false;
+        document.getElementById(hitter.id).style.border = 'none';
+       }else if(hit.bomb) {
+        console.log(hit.name, 'has bombed', hitter.name);
+        players[hitter.id].bomb = true;
+        document.getElementById('alert').innerText = `${hitter.name} WAS BOMBED!`.toUpperCase();
+        setTimeout(() => {
+          document.getElementById('alert').innerText = '';
+        }, 2000);
+        document.getElementById(hitter.id).style.border = `3px solid ${isColorLight(bomb.color) ? '#000' : '#fff'}`
+        hit.bomb = false;
+        document.getElementById(hit.id).style.border = 'none';
+       }
+       }
+
+      if ('GAMEMODE'.includes('grow') || 'GAMEMODE'.includes('shrink')) {
+        if (hit.body.circleRadius < 10 || hit.body.circleRadius > 300) {
+          return;
+        }
+        const newSize = hit.body.circleRadius + ('GAMEMODE'.includes('grow') ? 5 : -1);
+        const scaleFactor = newSize / hit.body.circleRadius; 
+
+        Matter.Body.scale(hit.body, scaleFactor, scaleFactor);
+
+        document.getElementById(hit.id).style.width = `${newSize * 2}px`;  
+        document.getElementById(hit.id).style.height = `${newSize * 2}px`; 
+      }
+
+      hit.knockback = hit.knockback ? hit.knockback + 'KB_ADD' : 1;
+      document.getElementById(`pl-${hit.id}-kb`).innerText = `💥 ${hit.knockback.toFixed(2)}`
+
+      const direction = { x: hit.body.position.x - hitter.body.position.x, y: hit.body.position.y - hitter.body.position.y };
+      const magnitude = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+      const normalizedDirection = { x: direction.x / magnitude, y: direction.y / magnitude };
+
+      if(!players[hitter.id].invincible) Body.setVelocity(hitter.body, { x: -10 * normalizedDirection.x, y: -10 * normalizedDirection.y });
+      if(!players[hit.id].invincible) Body.setVelocity(hit.body, { x: 10 * normalizedDirection.x * hit.knockback, y: 10 * normalizedDirection.y * hit.knockback });
+    }
+  });
+});
+
+Matter.Events.on(engine, 'collisionActive', function(event) {
+    const pairs = event.pairs;
+
+    for (let i = 0; i < pairs.length; i++) {
+        const pair = pairs[i];
+
+        if (players[pair.bodyA.label] && pair.bodyB.label === 'poison-zone' || players[pair.bodyB.label] && pair.bodyA.label === 'poison-zone') {
+                const currentTime = Date.now();
+                const elapsedTime = (currentTime - players[pair.bodyA.label].posionStart) / 1000;
+                if (elapsedTime > 2) {
+                   const plr = (players[pair.bodyA.label] ? pair.bodyA.label : pair.bodyB.label);
+                   if(!plr) return console.log('Player not found');
+                   if(players[plr].lives <= 1) return;
+                   if(players[plr].invincible) return;
+                    players[plr].lives--;
+                    document.getElementById(`pl-${plr}-l`).innerText = `${players[plr].lives}L`;
+                    document.getElementById('alert').innerText = `${players[plr].name} was poisoned!`.toUpperCase();
+                    setTimeout(() => {
+                      document.getElementById('alert').innerText = '';
+                    }, 2000);
+                    players[plr].posionStart = Date.now();
+                }
+        }
+    }
+});
+
+const POWERUP_TYPES = ['speed', 'jump', 'lives', 'invincible'];
+
+setInterval(() => {
+  if(!allowMoving) return
+    let types = []
+    if('SPEED_BOOST' != 0) types.push('speed')
+    if('JUMP_BOOST' != 0) types.push('jump')
+    if('REGAIN_LIFE' != false) types.push('lives')
+    if('INVINCIBLE' != false) types.push('invincible')
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * window.innerHeight;
+    const width = 50;
+    const height = 50;
+    const id = Math.random().toString(36).substring(7);
+    const type = types[Math.floor(Math.random() * types.length)];
+
+    const powerup = Bodies.rectangle(x, y, width, height, {
+      isStatic: true,
+      label: 'powerup-' + type + '-' + id,
+      render: {
+        fillStyle: 'transparent'
+      },
+      isSensor: true
+    });
+
+    const displayPowerup = document.createElement('div');
+    displayPowerup.style.position = 'absolute';
+    displayPowerup.style.left = `${x}px`;
+    displayPowerup.style.top = `${y}px`;
+    displayPowerup.style.width = `${width}px`;
+    displayPowerup.style.height = `${height}px`;
+    displayPowerup.style.borderRadius = '50%';
+    displayPowerup.id = id;
+
+    displayPowerup.style.display = 'flex';
+    displayPowerup.style.justifyContent = 'center';
+    displayPowerup.style.alignItems = 'center';
+    displayPowerup.style.fontFamily = 'sans-serif';
+    displayPowerup.style.color = 'white';
+    displayPowerup.style.fontSize = '30px';
+
+
+    console.log('Spawning powerup', type, x, y);
+
+    document.body.appendChild(displayPowerup);
+
+    if (type === 'speed') {
+      displayPowerup.innerHTML = '💨';
+    } else if (type === 'jump') {
+      displayPowerup.innerHTML = '🚀';
+    } else if (type === 'lives') {
+      displayPowerup.innerHTML = '❤️'
+    }else if (type === 'invincible') {
+      displayPowerup.innerHTML = '🛡️'
+    }
+
+    World.add(world, powerup);
+
+   setTimeout(() => {
+    console.log('Removing powerup', type);
+     if(document.getElementById(id)) document.getElementById(id).remove();
+     World.remove(world, powerup);
+   }, parseInt('POWERUP_DURATION') * 1000);
+  }, parseInt('POWERUP_FREQ') * 1000 + 1000);
+
+
+let PULSE_SHRINK_SCALE = 0.9981;
+let PULSE_EXPAND_SCALE = 1.0029;
+
+if (PULSE_PLATFORM == true) {
+    console.log('Pulsing platform width');
+    
+    let shrinking = true;
+
+    setInterval(() => {
+        const platform = world.bodies.find(body => body.label === 'floor');
+
+        if (!platform) {
+            console.error('Platform not found');
+        }
+
+        const currentWidth = platform.bounds.max.x - platform.bounds.min.x;
+
+        if (shrinking) {
+            if (currentWidth > 100) { // Continue shrinking
+                Body.scale(platform, 0.9981, 1);
+            } else { // Switch to expanding
+                shrinking = false;
+            }
+        } else {
+            const windowWidth = window.innerWidth;
+            if (currentWidth < windowWidth) { // Continue expanding
+                Body.scale(platform, 1.0029, 1);
+            } else { // Switch to shrinking
+                shrinking = true;
+            }
+        }
+
+    }, 10);
+}
+
+  document.getElementById('bg_music').play()
+
+  for (let i = 0; i < 'NPCS'; i++) {
+    if('GAMEMODE'.includes('race')) break;
+    let shapes =  [ 'circle', 'square', 'hexagon', 'octagon', 'pentagon', 'heptagon' ];
+    const { body } = newPlayer({ id: `npc-${i}`, name: `NPC${i+1}`, color: 'gray', shape: shapes[Math.floor(Math.random() * shapes.length) ] });
+
+    // chase closest player
+    setInterval(() => {
+      try{
+      if(!allowMoving) return
+      const player = Object.values(players).filter(p => !p.id.includes('npc')).sort((a, b) => {
+        const distanceA = Math.sqrt((a.body.position.x - body.position.x) ** 2 + (a.body.position.y - body.position.y) ** 2);
+        const distanceB = Math.sqrt((b.body.position.x - body.position.x) ** 2 + (b.body.position.y - body.position.y) ** 2);
+        return distanceA - distanceB;
+      })[0];
+      if (player) {
+        const direction = { x: player.body.position.x - body.position.x, y: player.body.position.y - body.position.y };
+        const magnitude = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+        const normalizedDirection = { x: direction.x / magnitude, y: direction.y / magnitude };
+
+        Body.setVelocity(body, { x: 5 * normalizedDirection.x, y: 5 * normalizedDirection.y });
+      }
+    }catch{
+      console.log('No players to chase')
+    }
+    }, 1000);
+    
+  }
+
+  if('GAMEMODE'.includes('pc')){
+    setInterval(() => {
+      if(!allowMoving) return
+      const x = Math.random() * window.innerWidth;
+      const y = Math.random() * window.innerHeight;
+      const width = 50;
+      const height = 50;
+      const id = Math.random().toString(36).substring(7);
+
+      console.log('Spawning point', x, y);
+
+      const powerup = Bodies.rectangle(x, y, width, height, {
+        isStatic: true,
+        label: 'point-' + id,
+        render: {
+          fillStyle: 'transparent'
+        },
+        isSensor: true
+      });
+
+      const displayPowerup = document.createElement('div');
+      displayPowerup.style.position = 'absolute';
+      displayPowerup.style.left = `${x}px`;
+      displayPowerup.style.top = `${y}px`;
+      displayPowerup.style.width = `${width}px`;
+      displayPowerup.style.height = `${height}px`;
+      displayPowerup.style.borderRadius = '50%';
+      displayPowerup.id = id;
+
+      displayPowerup.style.display = 'flex';
+      displayPowerup.style.justifyContent = 'center';
+      displayPowerup.style.alignItems = 'center';
+      displayPowerup.style.color = 'white';
+      displayPowerup.style.fontSize = '30px';
+
+
+      displayPowerup.innerHTML = '⭐';
+
+      console.log('Spawning point', x, y);
+
+      document.body.appendChild(displayPowerup);
+
+      World.add(world, powerup);
+
+      setTimeout(() => {
+        console.log('Removing point');
+        if(document.getElementById(id)) document.getElementById(id).remove();
+        World.remove(world, powerup);
+      }, 5000);
+    }, 3000);
+  }
+
+  if ('GAMEMODE'.includes('koth')) {
+  const area = document.createElement('div');
+  area.id = 'capture-zone';
+  area.style.position = 'absolute';
+  area.style.width = '200px';
+  area.style.height = '200px';
+  area.style.left = `${window.innerWidth * Math.random() - 100}px`;
+  area.style.top = `${window.innerHeight * Math.random() - 100}px`;
+  area.style.borderRadius = '50%';
+  area.style.backgroundColor = 'rgba(191, 155, 48, 0.3)';
+  document.body.appendChild(area);
+
+  const captureZoneX = parseFloat(area.style.left) + parseFloat(area.style.width) / 2;
+  const captureZoneY = parseFloat(area.style.top) + parseFloat(area.style.height) / 2;
+
+  // Create the platform
+  const platformWidth = 100;
+  const platformHeight = 10;
+  const platform = Bodies.rectangle(captureZoneX, captureZoneY, platformWidth, platformHeight, {
+    isStatic: true,
+    label: 'koth_platform',
+    render: {
+      fillStyle: "'PLATFORM_BG'",
+      strokeStyle: 'transparent'
+    }
+  });
+
+  World.add(world, platform);
+
+  let lastIncrementTime = Date.now();
+
+  Events.on(engine, 'beforeUpdate', function(event) {
+    const now = Date.now();
+
+    if (now - lastIncrementTime >= 1000) {
+      const playersInZone = Object.values(players).filter(player => {
+        const { body } = player;
+        return body.position.x > area.offsetLeft &&
+               body.position.x < area.offsetLeft + area.offsetWidth &&
+               body.position.y > area.offsetTop &&
+               body.position.y < area.offsetTop + area.offsetHeight;
+      });
+
+      playersInZone.forEach(player => { increment(player.id, 1); });
+
+      lastIncrementTime = now;
+    }
+  });
+}
+
+if('GAMEMODE'.includes('poison')){
+setInterval(() => {
+  if(!allowMoving) return
+  const x = Math.random() * window.innerWidth;
+  const y = Math.random() * window.innerHeight;
+  const width = Math.random() * 200 + 100;
+  const height = Math.random() * 200 + 100;
+
+  const poison = Bodies.rectangle(x, y, width, height, {
+    isStatic: true,
+    label: 'poison-zone',
+    render: {
+      fillStyle: 'rgba(0, 255, 0, 0.3)',
+      strokeStyle: 'transparent'
+    },
+    isSensor: true
+  });
+
+  World.add(world, poison);
+
+  setTimeout(() => {
+    World.remove(world, poison);
+  }, 10000);
+}, Math.random() * 5000 + 7000);
+
+}
+
+const explodeBomb = () => {
+  const player = Object.values(players).find(p => p.bomb);
+  console.log('Exploding bomb', player);
+  if(!player) return console.log('No player with bomb found');
+  player.lives = 0;
+  document.getElementById(`pl-${player.id}-l`).innerText = `${player.lives}L`;
+  isDead(player);
+  setTimeout(() => {
+    document.getElementById('alert').innerText = '';
+  }, 2000);
+}
+
+if('GAMEMODE'.includes('bomb')){
+setInterval(() => {
+    if(Object.keys(players).length <= 0) return
+  //  explodeIn = Math.floor(Math.random() * 'EX_MAX') + 'EX_MIN';
+    if(!allowMoving) return;
+    explodeBomb();
+    const player = Object.keys(players)[Math.floor(Math.random() * Object.keys(players).length)];
+    players[player].bomb = true;
+    document.getElementById('alert').innerText = `${players[player].name} has the bomb!`.toUpperCase();
+    cb();
+    cdown = explodeIn;
+  }, explodeIn * 1000);
+}
+
+const draggables = document.querySelectorAll('.draggable');
+const resizerMargin = 10; // margin to detect resizer drag
+
+draggables.forEach(draggable => { 
+    draggable.addEventListener('mousedown', (event) => {
+        let rect = draggable.getBoundingClientRect();
+        
+        // Check if the mouse is within the resizable area (near the edges)
+        if (event.clientX > rect.right - resizerMargin || event.clientY > rect.bottom - resizerMargin) {
+            // If within resizer margin, do not initiate drag
+            return;
+        }
+
+        let shiftX = event.clientX - rect.left;
+        let shiftY = event.clientY - rect.top;
+
+        function moveAt(pageX, pageY) {
+            draggable.style.left = pageX - shiftX + 'px';
+            draggable.style.top = pageY - shiftY + 'px';
+        }
+
+        function onMouseMove(event) {
+            moveAt(event.pageX, event.pageY);
+        }
+
+        function onMouseUp() {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            if (draggable.id === 'pl') {
+                localStorage.setItem('playerListPosition', JSON.stringify({ x: draggable.style.left, y: draggable.style.top }));
+            }
+            draggable.classList.remove('no-select');
+        }
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+        draggable.classList.add('no-select'); // Prevent text selection while dragging
+    });
+
+    draggable.ondragstart = () => false;
+});
+
+if (localStorage.getItem('playerListPosition')) {
+    const { x, y } = JSON.parse(localStorage.getItem('playerListPosition'));
+    document.getElementById('pl').style.left = x;
+    document.getElementById('pl').style.top = y;
+}
+
+document.head.insertAdjacentHTML('beforeend', `<style>
+    .no-select {
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+</style>`);
+
+if('GAMEMODE'.includes('invert')) {
+  engine.world.gravity.y = -1;
+}
+
+document.getElementById('bombTimer').style.top = document.getElementById('pl').offsetTop + document.getElementById('pl').offsetHeight - 15 + 'px';
+
+</script>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Main Process Console</title>
+  <script src="/socket.io.js"></script>
+  <div id="lidiv" class="container">
+    <h2>Login</h2>
+    <form id="signin">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <input type="submit" id="login" value="Login">
+    </form>
+</div>
+
+<script>
+    document.getElementById('signin').addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        document.getElementById('lidiv').style.display = 'none'
+
+        let success = false;
+
+        const socket = io({
+        extraHeaders: {
+            'Access-Control-Allow-Origin': '*',
+            type:"console",
+            user: document.getElementById('username').value,
+            pass: document.getElementById('password').value
+        }
+    })
+
+    socket.on('connect', () => {
+        console.log('Connected to server')
+    })
+    socket.on('console', (m) => {
+        document.getElementById('lidiv').style.display = 'none'
+       document.body.innerHTML += `<p>${m}</p>`
+    })
+
+    socket.on('console_error', (m) => {
+        if(m == 'ERR_INVALID_CREDENTIALS') {
+            alert('Invalid credentials');
+            document.getElementById('lidiv').style.display = 'flex'
+            return;
+        }
+       document.body.innerHTML += `<p style="color:red">${m}</p>`
+    })
+})
+
+    document.addEventListener('keydown', function(e) {
+        if ((window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)  && e.keyCode == 83) {
+            e.preventDefault();
+            const data = document.body.innerHTML.split('<!--CONSOLE_START-->')[2].split('<p>').join('\n').split('</p>').join('').split('<br>').join('\n')
+            const blob = new Blob([data], {type: 'text/plain'})
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = 'console.log'
+            a.click()
+        }else if(e.ctrlKey && e.keyCode == 67){
+            e.preventDefault();
+            document.body.innerHTML = ''
+        }
+    })
+</script>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: rgb(42, 42, 42);
+    }
+
+p{
+    padding-left: 15px;
+    color: white;
+    font-family:monospace;
+}
+
+button{
+    margin: 10px;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    background-color: #1a1a2e;
+}
+
+.container * {
+    color: white;
+}
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #0f3460;
+            background-color: #1a1a2e;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 600;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        ::placeholder {
+            color: #888;
+        }
+
+        *:focus {
+            outline:none;
+        }
+        #err{
+            color: red;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+</style>
+</head>
+<!--CONSOLE_START-->

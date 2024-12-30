@@ -1,0 +1,25 @@
+<style>
+#txt {
+    font-family: sans-serif;
+    font-size: 20px;
+    color: white;
+}
+
+body{
+        overflow: hidden;
+        background-color: #333;
+        touch-action: manipulation;
+    }
+</style>
+
+<label id="txt"></label>
+<script>
+if(typeof window.electron.exitController === 'function'){
+window.electron.exitController()
+}else{
+window.close()
+}
+setTimeout(() => {
+document.getElementById('txt').innerHTML = "Attempting to close window... If it doesn't close, please close it manually."
+}, 1300);
+</script>

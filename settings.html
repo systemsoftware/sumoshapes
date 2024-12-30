@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Honk&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a1a2e;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 90%;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Honk', cursive;
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            background-color: #16213e;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .tab {
+            background-color: transparent;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            padding: 10px 20px;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            flex-grow: 1;
+        }
+
+        .tab:hover, .tab.active {
+            background-color: #0f3460;
+        }
+
+        .tab-content {
+            background-color: #16213e;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .setting {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        label {
+            flex: 1;
+        }
+
+        input, select {
+            flex: 1;
+            padding: 5px;
+            border-radius: 3px;
+            border: 1px solid #0f3460;
+            background-color: #1a1a2e;
+            color: #fff;
+        }
+
+        input[type="file"] {
+            padding: 5px 0;
+        }
+
+        input[type="range"] {
+            width: 100%;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .btn-save {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+
+        .btn-save:hover {
+            background-color: #45a049;
+        }
+
+        .btn-discard {
+            background-color: #f44336;
+            color: #fff;
+        }
+
+        .btn-discard:hover {
+            background-color: #da190b;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8rem;
+        }
+
+        /* make same width as input */
+        .setting button{
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            background-color: #4CAF50;
+            color: #fff;
+        }
+
+        *{
+            outline: none;
+        }
+
+        #hint{
+           background-color: #16213e;
+              padding: 10px;
+                border-radius: 5px;
+        }
+
+    h4{
+      text-align: center;
+    }
+
+    #bg_music_path, #hit_sound_path{
+        cursor: pointer !important;
+    }
+
+input[type="range"] {
+  appearance: none;
+  width: 200px;
+  height: 15px;
+  background: #ddd;
+  outline: none;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  cursor: pointer;
+    background: linear-gradient(to right, #4CAF50 50%, rgb(221,221,221) 50%);
+  box-shadow: -407px 0 0 400px #4CAF50;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: transparent;
+  cursor: pointer;
+  box-shadow: -407px 0 0 400px #4CAF50;
+}
+
+
+input[type="range"]::-moz-range-progress {
+  background-color: #4CAF50;
+}
+
+input[type="range"]::-ms-fill-lower {
+  background-color: #4CAF50;
+}
+
+input[type="range"].maxed::-webkit-slider-thumb {
+    background: #4CAF50;
+}
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <h1>GAME SETTINGS</h1>
+        <div class="tabs">
+            <button class="tab active" data-tab="customize">Visuals</button>
+            <button class="tab" data-tab="audio">Audio</button>
+            <button class="tab" data-tab="gameplay">Gameplay</button>
+            <button class="tab" data-tab="powerups">Powerups</button>
+            <button class="tab" data-tab="advanced">Advanced</button>
+        </div>
+        <p onclick="document.getElementById('hint').style.display='none'" id="hint" style="text-align: center;">Settings are not saved until you click the "Save Changes" button.</p>
+
+        <form id="settingsForm">
+            <div id="customize" class="tab-content">
+                <h4>Background</h4>
+                <div class="setting">
+                    <label for="bg_type">Background Type</label>
+                    <select id="bg_type">
+                        <option value="color">Color</option>
+                        <option value="image">Image</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label for="bg_color">Background Color</label>
+                    <input type="text" id="bg_color">
+                </div>
+                <div class="setting">
+                    <label for="bg_img">Background Image</label>
+                    <input type="text" id="bg_img">
+                </div>
+                <h4>Platforms</h4>
+                <div class="setting">
+                    <label for="platform_bg">Platform Color</label>
+                    <input type="text" id="platform_bg" value="#000000">
+                </div>
+                <div class="setting">
+                    <label for="platformWidth">Floor Width <label style="cursor: pointer;" onclick="alert('This has 2 special values. Set this to \'window\' to make the floor the same width as the window, or set it to \'pulse\' to make the floor expand and contract.')">(?)</label></label>
+                    <input type="text" id="platformWidth" value="window">
+                </div>
+                <h4>Other</h4>
+                <div class="setting">
+                    <label for="blurPX">Leaderboard Blur</label>
+                    <input type="number" id="blurPX" value="10">
+                </div>
+                <div class="setting">
+                    <label>Titlebar Style*</label>
+                    <select id="titlebarStyle">
+                        <option value="hiddenInset">Hidden Inset</option>
+                        <option value="default">Show</option>
+                        <option value="hidden">Hidden</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label for="move-up">Clear Custom Stage</label>
+                    <button onclick="window.electron.clearCustomStage()" class="b">Clear</button>
+                </div>
+            </div>
+
+            <div id="audio" class="tab-content hidden">
+                <h4>Sound</h4>
+                <div class="setting">
+                    <label for="bg_music">Background Music</label>
+                    <input type="file" id="bg_music" accept="audio/*" style="display: none;">
+                    <input type="text" id="bg_music_path" readonly onclick="document.getElementById('bg_music').click()">
+                </div>
+                <div class="setting">
+                    <label for="sfx_vol">Hit Sound</label>
+                    <input type="file" id="hit_sound" accept="audio/*" style="display: none;">
+                    <input type="text" id="hit_sound_path" readonly onclick="document.getElementById('hit_sound').click()">
+                </div>
+                <h4>Volume</h4>
+                <div class="setting">
+                    <label for="bg_vol">Music Volume</label>
+                    <input type="range" id="bg_vol" min="0" max="1" step="0.0001">
+                </div>
+                <div class="setting">
+                    <label for="sfx_vol">Hit Sound Volume</label>
+                    <input type="range" id="hit_vol" min="0" max="1" step="0.0001">
+                </div>
+                <i style="font-size: x-small;color: gray;user-select: none;">Right click the input to remove the sound.</i>
+
+                    </div>
+            <div id="gameplay" class="tab-content hidden">
+                <h4>Physics</h4>
+                <div class="setting">
+                    <label for="speed">Speed*</label>
+                    <input type="number" id="speed">
+                </div>
+                <div class="setting">
+                    <label for="jumpForce">Jump Force</label>
+                    <input type="number" id="jumpForce" value="8">
+                </div>
+                <div class="setting">
+                    <label for="friction">Friction</label>
+                    <input type="number" id="friction" value="0.5">
+                </div>
+                <div class="setting">
+                    <label for="frictionAir">Air Friction</label>
+                    <input type="number" id="frictionAir" value="0.02">
+                </div>
+                <div class="setting">
+                    <label for="restitution">Restitution <label style="cursor: pointer;" onclick="alert(`The value is always positive and falls between 0 and 1. If it’s 0, collisions can be perfectly inelastic and there won’t be any bouncing. If it’s 0.5, the body can bounce back with about half of its original speed.`)">(?)</label></label>
+                    <input type="number" id="restitution" value="0.5">
+                </div>
+                <div class="setting">
+                    <label for="playerSize">Player Size (px)</label>
+                    <input type="number" id="playerSize" value="50">
+                </div>
+                <h4>Game Mechanics</h4>
+                <div class="setting">
+                    <label for="lives">Lives</label>
+                    <input type="number" id="lives">
+                </div>
+                <div class="setting">
+                    <label for="kbAdd">Knockback Add <label style="cursor: pointer;" onclick="alert('This is the amount of knockback added to a player when they are hit.')">(?)</label></label>
+                    <input type="number" id="kbAdd" value="0.05">
+                </div>
+                <div class="setting">
+                    <label for="allowFlight">Jump Type</label>
+                    <select id="allowFlight">
+                        <option value="true">Infinite</option>
+                        <option value="false">Normal</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label for="npcCount">NPCs</label>
+                    <input type="number" id="npcCount" value="0">
+                </div>
+                <div class="setting">
+                    <label for="randomPlatforms">Random Platforms</label>
+                    <select id="randomPlatforms">
+                        <option value="1">Enabled</option>
+                        <option selected value="2">Default Stage only</option>
+                        <option value="3">Custom Stages only</option>
+                        <option value="4">Disabled</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label for="platformFreq">Platform Frequency (seconds)</label>
+                    <input type="number" id="platformFreq" value="5">
+                </div>
+                <h4>Mutators</h4>
+                <div class="setting">
+                    <label for="firstTo">First To <label style="cursor: pointer;" onclick="alert('For mutators with points (Point Capture, King of the Hill), this is the number of points needed to win.')">(?)</label></label>
+                    <input type="number" id="firstTo" value="10">
+                </div>
+                <div class="setting">
+                    <label for="phantomOpacity">Phantom Opacity <label style="cursor: pointer;" onclick="alert('This is where the effect will stop where 1 is fully visible and 0 is invisible.')">(?)</label></label>
+                    <input type="number" id="phantomOpacity" value="0.4">
+                </div>
+                <div class="setting">
+                    <label for="phantomDur">Phantom Duration <label style="cursor: pointer;" onclick="alert('This is how long the total effect will last from 1 opacity to your set opacity and back to 1 opacity.')">(?)</label></label>
+                    <input type="number" id="phantomDur" value="20">
+                </div>
+                <div class="setting">
+                    <label for="explodeMin">Bomb Explode Min <label style="cursor: pointer;" onclick="alert('This is the minimum time before a bomb explodes.')">(?)</label></label>
+                    <input type="number" id="explodeMin" value="20">
+                </div>
+                <div class="setting">
+                    <label for="explodeMax">Bomb Explode Max <label style="cursor: pointer;" onclick="alert('This is the maximum time before a bomb explodes.')">(?)</label></label>
+                    <input type="number" id="explodeMax" value="30">
+                </div>
+                        </div>
+
+            <div id="powerups" class="tab-content hidden">
+                    <p style="text-align: center;">Set to 0 to disable</p>
+                <div class="setting">
+                    <label for="powerupFreq">Frequency (seconds)</label>
+                    <input type="number" id="powerupFreq">
+                </div>
+                <div class="setting">
+                    <label for="powerupDur">Duration (seconds)</label>
+                    <input type="number" id="powerupDur">
+                </div>
+                <div class="setting">
+                    <label for="speedBoost">Speed Boost Multiplier</label>
+                    <input type="number" id="speedBoost" value="2">
+                </div>
+                <div class="setting">
+                    <label for="jumpBoost">Jump Boost Multiplier</label>
+                    <input type="number" id="jumpBoost" value="2">
+                </div>
+                <div class="setting">
+                    <label>Regain Life</label>
+                    <select id="regainLife">
+                        <option value="true">Enabled</option>
+                        <option value="false">Disabled</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label for="invincible">Invincibility</label>
+                    <select id="invincible">
+                        <option value="true">Enabled</option>
+                        <option value="false">Disabled</option>
+                    </select>
+                </div>
+                            </div>
+
+            <div id="advanced" class="tab-content hidden">
+                <h4>Server</h4>
+                <div class="setting">
+                    <label for="port">Port*</label>
+                    <input type="number" id="port">
+                </div>
+                <div class="setting">
+                    <label for="fallbackPort">Fallback Port* <label style="cursor: pointer;" onclick="alert('This is the port used if the main port is in use.')">(?)</label></label>
+                    <input type="number" id="fallbackPort">
+                </div> 
+                <h4>Logging</h4>
+                <div class="setting dev" id="_console">
+                    <label for="console">MP Console* <label style="cursor: pointer;" onclick="alert('This is the console for the main proccess, where the server and app logic is.')">(?)</label></label>
+                    <select id="console">
+                        <option value="true">Enabled</option>
+                        <option selected value="false">Disabled</option>
+                    </select>
+                </div>   
+                <div class="setting dev">
+                    <label>Socket.io Admin UI* <label style="cursor: pointer;" onclick="alert('This is the mode the socket.io console will be in. Development will show more information than production, but uses more resources.')">(?)</label></label>
+                    <select id="socketAdmin">
+                        <option value="disabled">Disabled</option>
+                        <option value="production">Production</option>
+                        <option value="development">Development</option>
+                    </select>
+                </div>  
+                <div class="setting dev" id="_console_show">
+                    <label for="console">Open MP Console</label>
+                    <button style="margin-left: 15px;" onclick="window.electron.openConsole()" class="b">Open</button>
+                </div>  
+                <div class="setting dev">
+                    <label for="console">Open Socket.io Admin UI</label>
+                    <button style="margin-left: 15px;" onclick="window.electron.socketAdmin()" class="b">Open</button>
+                </div> 
+                <h4>Log Security</h4>
+                <div class="setting dev">
+                    <label>Admin Username <label style="cursor: pointer;" onclick="alert('This is the username used to login to both the socket.io console and the main console.')">(?)</label></label>
+                    <input type="text" id="adminUser">
+                </div>  
+                <div class="setting dev">
+                    <label>Admin Password</label>
+                    <input type="password" id="adminPass" placeholder="For security purposes, this is not shown.">
+                </div>
+                <h4>Window Settings</h4>
+                <div class="setting">
+                    <label>Remember Window Size</label>
+                    <select id="rememberSize">
+                        <option value="false">Disabled</option>
+                        <option value="true">Enabled</option>
+                    </select>
+                </div>  
+                <div class="setting">
+                    <label>Remember Window Position</label>
+                    <select id="rememberPos">
+                        <option value="false">Disabled</option>
+                        <option value="true">Enabled</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label>Reset Window Size and Position</label>
+                    <button type="button" onclick="window.electron.resetWinSize()">Reset</button>
+                </div>
+                <h4>Other</h4>
+                <div class="setting">
+                    <label for="move-up">Discord RPC</label>
+                    <select id="disableRPC">
+                        <option value="false">Enabled</option>
+                        <option value="true">Disabled</option>
+                    </select>
+                </div>    
+                <div class="setting">
+                    <label>Stage Storage* <label style="cursor: pointer;" onclick="alert('This is where the stages will be stored. In memory will store the stages in your RAM, which is faster but will be lost when the app is closed. In file will store the stages in a file, which is slower but will be saved.')">(?)</label></label>
+                    <select id="storeIn">
+                        <option value="mem">In memory</option>
+                        <option value="file">In file</option>
+                    </select>
+                </div>
+                <div class="setting">
+                    <label>Config File</label>
+                    <button type="button" onclick="window.electron.openFile()">Open</button>
+                </div> 
+                <div class="setting">
+                    <label>App Credits</label>
+                    <button type="button" onclick="window.electron.credits()">View</button>
+                </div> 
+                <div class="setting dev">
+                    <label>Make your own controller</label>
+                    <button type="button" onclick="window.electron.forkRepo()">Fork on GitHub</button>
+                </div>
+                   </div>
+   
+
+            <div class="buttons">
+                <button type="button" id="save" class="btn btn-save">Save Changes</button>
+                <button type="button" class="btn btn-discard" onclick="discardChanges()">Discard Changes</button>
+            </div>
+        </form>
+
+        <footer>
+            <p>* Restart Required</p>
+        </footer>
+    </div>
+
+    <script>
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const homedir = window.electron.homedir();
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.add('hidden'));
+
+                localStorage.setItem('tab', tabId);
+                
+                tab.classList.add('active');
+                document.getElementById(tabId).classList.remove('hidden');
+            });
+        });
+
+        if(localStorage.getItem('tab')){
+            document.querySelector(`[data-tab="${localStorage.getItem('tab')}"]`).click();
+        }
+
+        const settings = window.electron.getSettings()
+     Object.keys(settings).forEach(key => {
+         const input = document.getElementById(key);
+         if (input) {
+            if(key === 'adminPass') return
+            if(key == 'bg_music') return document.getElementById('bg_music_path').value = settings[key].replace(homedir, '~')
+            if(key == 'hit_sound') return document.getElementById('hit_sound_path').value = settings[key].replace(homedir, '~')
+            if(key == 'bg_vol' || key == 'hit_vol'){
+                if(settings[key] == 1){
+                    input.classList.add('maxed');
+                    input.style.background = '#4CAF50';
+                }
+            }
+            if (input.type === 'checkbox') {
+                input.checked = settings[key];
+            } else if(input.type === 'file'){
+                return
+             } if(settings[key]){
+                input.value = settings[key];
+         }
+        }
+     });
+
+        document.getElementById('save').addEventListener('click', () => {
+         const newSettings = {};
+         document.querySelectorAll('input, select').forEach(input => {
+            if (input.type === 'checkbox') {
+                newSettings[input.id] = input.checked;
+            }else if(input.type === 'file' && input.files[0]){
+                newSettings[input.id] = input.files[0].path
+            }
+            else{
+            if(input.id === 'adminPass' && input.value === '') return
+             newSettings[input.id] = input.value;
+            }
+            if(input.id === 'bg_music_path') newSettings['bg_music'] = input.value.replace('~', homedir);
+            if(input.id === 'hit_sound_path') newSettings['hit_sound'] = input.value.replace('~', homedir);
+         });
+         delete newSettings['bg_music_path'];
+         delete newSettings['hit_sound_path'];
+         window.electron.saveSettings(newSettings);
+     });
+
+        // Discard changes
+        function discardChanges() {
+            if (confirm('Are you sure you want to discard these changes?')) {
+                window.electron.menu();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.shiftKey && e.key == 'I') {
+                window.electron.devTools();
+            }else if(e.shiftKey){
+                document.querySelectorAll('.dev').forEach(c => c.style.display = 'flex');
+            }
+        });
+
+        document.getElementById('hit_sound_path').addEventListener('contextmenu', (e) => {
+            if(!confirm('Are you sure you want to remove the hit sound? This will NOT remove the file from your computer.')) return e.preventDefault();
+            e.preventDefault();
+            document.getElementById('hit_sound_path').value = '';
+        });
+
+        document.getElementById('bg_music_path').addEventListener('contextmenu', (e) => {
+            if(!confirm('Are you sure you want to remove the background music? This will NOT remove the file from your computer.')) return e.preventDefault();
+            e.preventDefault();
+            document.getElementById('bg_music_path').value = '';
+        });
+
+        document.querySelectorAll('input[type="range"]').forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.value == input.max) {
+                    input.classList.add('maxed');
+                    input.classList.remove('zeroed');
+                    input.style.background = '#4CAF50';
+                }else{
+                    input.classList.remove('maxed');
+                    input.classList.add('zeroed');
+                    input.style.background = '#ddd';
+                }
+            });
+        });
+
+        document.getElementById('bg_music').addEventListener('change', (e) => {
+           document.getElementById('bg_music_path').value = window.electron.webUtils.getPathForFile(e.target.files[0]).replace(homedir, '~');
+        });
+
+        document.getElementById('hit_sound').addEventListener('change', (e) => {
+           document.getElementById('hit_sound_path').value = window.electron.webUtils.getPathForFile(e.target.files[0]).replace(homedir, '~');
+        });
+    </script>
+</body>
+</html>
