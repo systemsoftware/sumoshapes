@@ -756,22 +756,36 @@ electron.ipcMain.on('removeSound', () => {
 })
 
 electron.ipcMain.on('openStage', (e, stageOwner, stageName) => {
-    const options = ['Open on GitHub', 'View Preview', 'Show QR Code', 'Cancel'];
+    const options = [ 'View Preview', 'View Source', 'Show QR Code', 'Open on GitHub', 'Cancel'];
     electron.dialog.showMessageBox(win, {
         type: 'info',
         message: 'What would you like to do with ' + stageName + '?',
         buttons: options
     }).then(async res => {
         if (res.response == 0) {
-            electron.shell.openExternal(`https://github.com/${stageOwner}/${stageName}`);
-        } else if (res.response == 1) {
             const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
-           const b = new electron.BrowserWindow({ width, height })
-           b.loadURL(`http://localhost:${usingFallbackPort ? fallbackPort : port}/preview?stage=${stageOwner}/${stageName}`)
+            const b = new electron.BrowserWindow({ width, height })
+            b.loadURL(`http://localhost:${usingFallbackPort ? fallbackPort : port}/preview?stage=${stageOwner}/${stageName}`)
+        } else if (res.response == 1) {
+            new electron.BrowserWindow({ width: 700, height: 500, resizable:false }).loadURL(`http://localhost:${usingFallbackPort ? fallbackPort : port}/source?stage=${stageOwner}/${stageName}`);
         }else if(res.response == 2){
-        win.webContents.send('qr', `https://github.com/${stageOwner}/${stageName}`);
+            win.webContents.send('qr', `https://github.com/${stageOwner}/${stageName}`);
+        }else if(res.response == 3){
+            electron.shell.openExternal(`https://github.com/${stageOwner}/${stageName}`);
         }
         })
+})
+
+
+app.get('/source', async (req, res) => {
+    if(req.query.raw == 'true'){
+        const u = req.query.stage.split('/')[0];
+        const r = req.query.stage.split('/')[1];
+        const response = await fetch(`https://raw.githubusercontent.com/${u}/${r}/main/index.json`);
+        const data = await response.json();
+        return res.json(data);
+    }
+    res.sendFile(__dirname + '/source.html');
 })
 
 electron.ipcMain.on('openMode', () => {
