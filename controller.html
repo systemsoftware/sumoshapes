@@ -6,39 +6,60 @@
   <title>Sumo Shapes Controller</title>
   <script src="/socket.io.js"></script>
   <script async src="/movement.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <style>
+    :root {
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #16213e;
+      --bg-active: #2a325e;
+      --accent: #4361ee;
+      --text: #ffffff;
+      --border-radius: 16px;
+      --button-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.2s ease;
+    }
+
     body {
       overflow: hidden;
-      background-color: #1a1a2e;
+      background-color: var(--bg-primary);
       touch-action: manipulation;
       margin: 0;
       padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     * {
       outline: none;
       user-select: none !important;
-      color: white;
+      color: var(--text);
       font-family: Poppins, sans-serif;
+      box-sizing: border-box;
     }
 
     .movement-button {
-      background-color: #16213e;
-      color: #fff;
+      background-color: var(--bg-secondary);
+      color: var(--text);
       border: none;
-      border-radius: 15px;
-      font-weight: bold;
+      border-radius: var(--border-radius);
+      font-weight: 600;
       width: 100%;
       height: 100%;
-      min-height: 100px;
-      font-size: 2rem;
-      transition: background-color 0.2s;
+      min-height: 140px;
+      font-size: 2.5rem;
+      transition: var(--transition);
+      box-shadow: var(--button-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .movement-button:active {
-      background-color: #2a325e;
+      background-color: var(--bg-active);
+      transform: translateY(2px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .control-grid {
@@ -47,101 +68,169 @@
         ". up ."
         "left . right"
         ". down ."
-        "exit reconnect customize";
+        "utility utility utility";
       grid-template-columns: 1fr 1fr 1fr;
       grid-template-rows: 1fr 1fr 1fr auto;
-      gap: 10px;
-      padding: 20px;
-      height: 92vh;
-      max-width: 500px;
+      gap: 12px;
+      padding: 16px;
+      height: 100vh;
+      width: 100%;
+      max-width: 800px;
       margin: 0 auto;
     }
 
     .utility-buttons {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-      margin-top: 20px;
+      grid-area: utility;
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      width: 100%;
     }
 
     .utility-button {
-      background-color: #16213e;
-      color: #fff;
+      background-color: var(--bg-secondary);
+      color: var(--text);
       border: none;
-      border-radius: 10px;
-      padding: 15px;
-      font-weight: bold;
-      font-size: 0.9rem;
+      border-radius: calc(var(--border-radius) - 4px);
+      padding: 20px 16px;
+      font-weight: 500;
+      font-size: 1rem;
+      transition: var(--transition);
+      box-shadow: var(--button-shadow);
+      flex: 1;
+      width: 33.33%;
     }
 
-    .center {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+    .utility-button:active {
+      background-color: var(--bg-active);
+      transform: translateY(2px);
+    }
+
+    .customize-panel {
+      position: fixed;
+      z-index: 1000;
+      background-color: var(--bg-primary);
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .customize-card {
+      background-color: var(--bg-secondary);
+      padding: 32px;
+      border-radius: var(--border-radius);
       width: 90%;
-      max-width: 400px;
-      text-align: center;
-      padding: 20px;
-      border-radius: 10px;
-      background-color: #16213e;
-      z-index: 100000;
+      max-width: 440px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .customize-card h2 {
+      margin: 0 0 24px 0;
+      font-weight: 600;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
     }
 
     input, select {
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      margin: 10px 0;
-      width: 90%;
-      text-align: center;
-      background-color: #1a1a2e;
-      color: white;
+      width: 100%;
+      padding: 14px;
+      border: 2px solid var(--bg-active);
+      border-radius: calc(var(--border-radius) - 4px);
+      background-color: var(--bg-primary);
+      color: var(--text);
       font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+    }
+
+    input[type="color"] {
+      height: 50px;
+      padding: 8px;
     }
 
     #startb {
-      width: 90%;
-      padding: 12px;
-      background-color: #4361ee;
+      width: 100%;
+      padding: 16px;
+      background-color: var(--accent);
       border: none;
-      border-radius: 8px;
-      margin: 10px 0;
-      font-size: 1rem;
+      border-radius: calc(var(--border-radius) - 4px);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 8px;
       cursor: pointer;
+      transition: var(--transition);
+    }
+
+    #startb:hover {
+      filter: brightness(1.1);
     }
 
     @media (max-width: 768px) {
       .control-grid {
-        height: 85vh;
-        gap: 8px;
-        padding: 15px;
+        gap: 10px;
+        padding: 12px;
       }
 
       .movement-button {
-        min-height: 80px;
+        min-height: 120px;
+        font-size: 2rem;
+      }
+
+      .customize-card {
+        padding: 24px;
+      }
+      
+      .utility-button {
+        padding: 16px 12px;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-height: 700px) {
+      .movement-button {
+        min-height: 100px;
+      }
+      
+      .utility-button {
+        padding: 14px 10px;
       }
     }
   </style>
 </head>
 <body>
-    <div id="customize" style="width: 100%;position: fixed;z-index: 1000;background-color: #1a1a2e;height: 100%;top: 0;left: 0;text-align: center;">
-       <div class="center">
-        <h2>Choose Your Character</h2>
-        <input type="text" id="name" placeholder="Enter your name" />
-        <input type="color" id="color" value="#ffffff" />
-        <select id="shape">
-            <option value="circle">Circle</option>
-            <option value="triangle">Triangle</option>
-            <option value="square">Square</option>
-            <option value="star">Star</option>
-            <option value="hexagon">Hexagon</option>
-            <option value="octagon">Octagon</option>
-            <option value="pentagon">Pentagon</option>
-            <option value="heptagon">Heptagon</option>
-        </select>
-        <input type="url" id="file" placeholder="Image URL"/>
+    <div id="customize" class="customize-panel">
+       <div class="customize-card">
+        <h2 style="text-align: center;">Choose Your Character</h2>
+        <div class="input-group">
+          <input type="text" id="name" placeholder="Enter your name" />
+        </div>
+        <div class="input-group">
+          <input type="color" id="color" value="#ffffff" />
+        </div>
+        <div class="input-group">
+          <select id="shape">
+              <option value="circle">Circle</option>
+              <option value="triangle">Triangle</option>
+              <option value="square">Square</option>
+              <option value="star">Star</option>
+              <option value="hexagon">Hexagon</option>
+              <option value="octagon">Octagon</option>
+              <option value="pentagon">Pentagon</option>
+              <option value="heptagon">Heptagon</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <input type="url" id="file" placeholder="Image URL"/>
+        </div>
         <button id="startb" onclick="start()">Join Game</button>
       </div>
     </div>
@@ -183,7 +272,6 @@
             </button>
         </div>
     </div>
+    <script src="/controller.js"></script>
 </body>
 </html>
-
-<script src="/controller.js"></script>

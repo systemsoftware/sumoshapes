@@ -22,6 +22,7 @@ Remember window size and position
 Customize titlebar style
 Keykinds for all Menubar actions
 Fixed volume settings
-Other small changes and bug fixes
 Lite version
 Added Platform Pallete to Stage Builder for easier platform editing
+Redesigned controller with larger buttons
+Other small changes and bug fixes
