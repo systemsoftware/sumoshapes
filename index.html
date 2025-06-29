@@ -1162,7 +1162,7 @@ document.getElementById('alert').innerText = '';
       if(powerup === 'invincible') players[player.body.label].invincible = true;
       if (powerup === 'lives') {
         players[player.body.label].lives += 1;
-        document.getElementById(`pl-${player.body.label}-l`).innerText = `${players[player.body.label].lives}L`;
+        document.getElementById(`pl-${player.body.label}-l`).innerText = `❤️ ${players[player.body.label].lives}`;
       }
 
       document.getElementById(player.body.label).style.border = `2px solid ${powerup === 'speed' ? 'blue' : powerup === 'jump' ? 'green' : powerup === 'invincible' ? 'red' : 'white'}`;
@@ -1254,7 +1254,7 @@ document.getElementById('alert').innerText = '';
 
       if ('GAMEMODE'.includes('one')) {
         players[hit.id].lives--;
-        document.getElementById(`pl-${hit.id}-l`).innerText = `${players[hit.id].lives}L`;
+        document.getElementById(`pl-${hit.id}-l`).innerText = `❤️ ${players[hit.id].lives}`;
         document.getElementById('alert').innerText = `${players[hit.id].name} has lost a life!`.toUpperCase();
         setTimeout(() => {
           document.getElementById('alert').innerText = '';
@@ -1327,7 +1327,7 @@ Matter.Events.on(engine, 'collisionActive', function(event) {
                    if(players[plr].lives <= 1) return;
                    if(players[plr].invincible) return;
                     players[plr].lives--;
-                    document.getElementById(`pl-${plr}-l`).innerText = `${players[plr].lives}L`;
+                    document.getElementById(`pl-${plr}-l`).innerText = `❤️ ${players[plr].lives}`;
                     document.getElementById('alert').innerText = `${players[plr].name} was poisoned!`.toUpperCase();
                     setTimeout(() => {
                       document.getElementById('alert').innerText = '';
@@ -1603,7 +1603,7 @@ const explodeBomb = () => {
   console.log('Exploding bomb', player);
   if(!player) return console.log('No player with bomb found');
   player.lives = 0;
-  document.getElementById(`pl-${player.id}-l`).innerText = `${player.lives}L`;
+  document.getElementById(`pl-${player.id}-l`).innerText = `❤️ ${player.lives}`;
   isDead(player);
   setTimeout(() => {
     document.getElementById('alert').innerText = '';

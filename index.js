@@ -9,6 +9,7 @@ const os = require('os');
 const https = require('https');
 const expressLicense = require('express-license');
 let CHANGED_SAVE_TYPE = false;
+const { autoUpdater } = require('electron-updater');
 
 const StageManager = require('./StageManager');
 
@@ -121,6 +122,31 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 electron.app.on('ready', async () => {
+
+    autoUpdater.checkForUpdatesAndNotify();
+
+    autoUpdater.on('update-available', () => {
+        dialog.showMessageBox({
+            type: 'info',
+            title: 'Update Available',
+            message: 'A new update is available. Downloading now...',
+        });
+    });
+
+    autoUpdater.on('update-downloaded', () => {
+        dialog.showMessageBox({
+            type: 'info',
+            title: 'Update Ready',
+            message: 'Update downloaded. The application will restart to apply the update.',
+        }).then(() => {
+            autoUpdater.quitAndInstall();
+        });
+    });
+
+    autoUpdater.on('error', (error) => {
+        dialog.showErrorBox('Update Error', error == null ? 'Unknown error' : error.toString());
+    });
+
     let { bg_music, hit_sound, port, speed, fallbackPort } = JSON.parse(fs.readFileSync(`${appPath}/config.json`, 'utf8'));
     if(bg_music && !fs.existsSync(bg_music)) electron.dialog.showErrorBox('Error', 'Background music file not found. Please check the path in the settings and restart the app.');
     if(hit_sound && !fs.existsSync(hit_sound)) electron.dialog.showErrorBox('Error', 'Hit sound file not found. Please check the path in the settings and restart the app.');
